@@ -1,6 +1,6 @@
-name := "cucumber-sbt-plugin"
+name := "xsbt-cucumber-plugin"
 
-version := "0.6"
+version := "0.1"
 
 organization := "templemore"
 
