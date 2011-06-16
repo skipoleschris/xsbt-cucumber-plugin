@@ -28,6 +28,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Scala 2.8.1" level="project" />
     <orderEntry type="library" name="SBT 0.10" level="project" />
+    <orderEntry type="library" name="Scalatest 1.5" level="project" />
   </component>
 </module>
 
