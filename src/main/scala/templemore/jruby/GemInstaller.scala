@@ -1,9 +1,9 @@
 package templemore.jruby
 
+import sbt._
 import scala.Some
 import sbt.OutputStrategy
 import java.io.File
-import templemore.path.Path
 
 /**
  * @author Chris Turner
@@ -33,7 +33,6 @@ case class GemInstaller(jRubyHome: File,
   protected val javaOpts = List[String]()
 
   def installGem(gem: Gem, force: Boolean = false): Int = {
-    import Path._
     def present(gem: Gem) = (gemDir / "gems" / gem.toString).exists
 
     if ( !present(gem) || force )

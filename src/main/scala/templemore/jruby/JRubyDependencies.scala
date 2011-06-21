@@ -11,9 +11,9 @@ trait JRubyDependencies {
   private val cuke4DukeVersion = "0.4.4"
   private val picoContainerVersion = "2.11.2"
 
-  def jRubyDependencies = Seq("org.jruby" % "jruby-complete" % jrubyVersion % "cuke->default",
-                              "cuke4duke" % "cuke4duke" % cuke4DukeVersion % "cuke->default",
-                              "org.picocontainer" % "picocontainer" % picoContainerVersion % "cuke->default")
+  def jRubyDependencies = Seq("org.jruby" % "jruby-complete" % jrubyVersion % "cucumber->default",
+                              "cuke4duke" % "cuke4duke" % cuke4DukeVersion % "test",
+                              "org.picocontainer" % "picocontainer" % picoContainerVersion % "test")
 
   private val cukesMavenRepo = "Cuke4Duke Maven Repository" at "http://cukes.info/maven"
 

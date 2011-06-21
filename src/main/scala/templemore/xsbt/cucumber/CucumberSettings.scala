@@ -7,6 +7,4 @@ import java.io.File
  */
 case class CucumberSettings(featuresDir: File,
                             requiredPath: List[String],
-                            options: List[String],
-                            tags: List[String],
-                            names: List[String])
+                            options: List[String])

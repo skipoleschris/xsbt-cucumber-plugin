@@ -1,8 +1,8 @@
 package templemore.jruby
 
+import sbt._
 import java.io.File
 import sbt.OutputStrategy
-import templemore.path.Path
 
 /**
  * @author Chris Turner
@@ -21,8 +21,7 @@ case class Cucumber(jRubyHome: File,
 
   def cuke(featuresDir: File, testCompileClasspath: List[String], options: List[String] = List(),
            tags: List[String] = List(), names: List[String] = List()): Int = {
-    import Path._
-    def cuke4duke = (gemDir / "bin" / "cuke4duke").toString
+    def cuke4duke = (gemDir / "bin" / "cuke4duke").getPath
 
     jruby( (cuke4duke :: featuresDir.getPath :: "--require" :: makeClasspath(testCompileClasspath) :: "--color" :: Nil) ++
            options ++ makeOptionsList(tags, "--tags") ++ makeOptionsList(names, "--names") )
