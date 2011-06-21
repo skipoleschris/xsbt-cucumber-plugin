@@ -13,6 +13,7 @@ class GemInstallerSpec extends FlatSpec with MustMatchers with BeforeAndAfterEac
 
   private val jRubyHome = new File(System.getProperty("user.dir"), "target")
   private val gemDir = new File(jRubyHome, "gems")
+  private val cucumberVersion = "1.0.0"
 
   override def beforeEach() {
     if ( gemDir.exists ) deleteAllFiles(gemDir)
@@ -24,9 +25,9 @@ class GemInstallerSpec extends FlatSpec with MustMatchers with BeforeAndAfterEac
     val installer = new GemInstaller(jRubyHome, gemDir,
                                      List("/Users/chris/.ivy2/cache/org.jruby/jruby-complete/jars/jruby-complete-1.6.1.jar"),
                                      StdoutOutput)
-    installer.installGem(Gem("cucumber", Some("0.10.6"), Some("http://rubygems.org/")))
+    installer.installGem(Gem("cucumber", Some(cucumberVersion), Some("http://rubygems.org/")))
 
-    new File(gemDir, "gems/cucumber-0.10.6").exists() must be(true)
+    new File(gemDir, "gems/cucumber-" + cucumberVersion).exists() must be(true)
   }
 
   private def deleteAllFiles(dir: File): Unit = dir.listFiles.foreach { f =>

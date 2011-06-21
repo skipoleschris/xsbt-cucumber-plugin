@@ -14,6 +14,9 @@ private[jruby] trait JRuby {
   protected def javaOpts: List[String]
   protected def outputStrategy: OutputStrategy
 
+  protected def maxMemory = "256M"
+  protected def maxPermGen = "64M"
+
   protected def jruby(arguments: List[String]): Int = {
     val args = jvmArgs ++ ("org.jruby.Main" :: arguments)
     Fork.java(None, args, None, jRubyEnv, outputStrategy)
@@ -22,5 +25,9 @@ private[jruby] trait JRuby {
   private def jRubyEnv = Map("GEM_PATH" -> gemDir.getPath,
                              "HOME" -> jRubyHome.getPath)
 
-  private def jvmArgs = "-classpath" :: classpath.mkString(System.getProperty("path.separator")) :: javaOpts
+  private def jvmArgs = "-classpath" :: makeClasspath(classpath) ::
+                        ("-Xmx%s" format maxMemory) :: ("-XX:MaxPermSize=%s" format maxPermGen) :: javaOpts
+
+  protected def makeClasspath(pathElements: List[String]) = pathElements mkString(File.pathSeparator)
+  protected def makeOptionsList(options: List[String], flag: String) = options flatMap(List(flag, _))
 }

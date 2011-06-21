@@ -1,14 +1,16 @@
 package templemore.jruby
 
 import scala.Some
-import sbt.{OutputStrategy, Fork}
+import sbt.OutputStrategy
 import java.io.File
+import templemore.path.Path
 
 /**
  * @author Chris Turner
  */
 case class Gem(name: String, version: Option[String], source: Option[String]) {
 
+  override def toString = "%s-%s" format(name, version)
   def toArgs = (name :: versionArgs) ++ sourceArgs
 
   private def versionArgs = version match {
@@ -30,7 +32,13 @@ case class GemInstaller(jRubyHome: File,
 
   protected val javaOpts = List[String]()
 
-  def installGem(gem: Gem): Int =
-    jruby(("-S" :: "gem" :: "install" :: "--no-ri" :: "--no-rdoc" ::
-          "--install-dir" :: gemDir.getPath :: Nil) ++ gem.toArgs)
+  def installGem(gem: Gem, force: Boolean = false): Int = {
+    import Path._
+    def present(gem: Gem) = (gemDir / "gems" / gem.toString).exists
+
+    if ( !present(gem) || force )
+      jruby(("-S" :: "gem" :: "install" :: "--no-ri" :: "--no-rdoc" ::
+            "--install-dir" :: gemDir.getPath :: Nil) ++ gem.toArgs)
+    else 0
+  }
 }
