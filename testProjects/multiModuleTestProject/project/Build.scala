@@ -1,0 +1,34 @@
+import sbt._
+import Keys._
+
+object BuildSettings {
+  val buildOrganization = "templemore"
+  val buildScalaVersion = "2.9.0-1"
+  val buildVersion      = "0.1"
+
+  val buildSettings = Defaults.defaultSettings ++ Seq (organization := buildOrganization,
+                                           scalaVersion := buildScalaVersion,
+                                           version      := buildVersion)
+}
+
+object Dependencies {
+
+  val scalaTest = 	"org.scalatest" % "scalatest_2.9.0" % "1.4.1" % "test"
+
+  val testDeps = Seq(scalaTest)
+}
+
+object FTUtilsBuild extends Build {
+  import Dependencies._
+  import BuildSettings._
+
+  lazy val multiModuleTestProject = Project ("test-project", file ("."),
+           settings = buildSettings) aggregate (jarProject, warProject)
+
+
+  lazy val jarProject = Project ("jar-project", file ("jar-project"),
+           settings = buildSettings ++ Seq (libraryDependencies := testDeps))
+
+  lazy val warProject = Project ("war-project", file ("war-project"),
+           settings = buildSettings) dependsOn (jarProject)
+}
