@@ -18,4 +18,5 @@ trait JRubyDependencies {
   private val cukesMavenRepo = "Cuke4Duke Maven Repository" at "http://cukes.info/maven"
 
   def jRubyResolvers = Seq(cukesMavenRepo)
+  def jRubyBaseDir = new File(System.getProperty("user.home"), ".jruby")
 }

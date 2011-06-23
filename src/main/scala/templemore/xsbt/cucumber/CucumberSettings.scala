@@ -6,5 +6,5 @@ import java.io.File
  * @author Chris Turner
  */
 case class CucumberSettings(featuresDir: File,
-                            requiredPath: List[String],
+                            requiredPath: List[File],
                             options: List[String])

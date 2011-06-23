@@ -10,7 +10,11 @@ import java.io.File
  */
 case class Gem(name: String, version: Option[String], source: Option[String]) {
 
-  override def toString = "%s-%s" format(name, version)
+  override def toString = version match {
+    case None => name
+    case Some(v) => "%s-%s" format(name, v)
+  }
+
   def toArgs = (name :: versionArgs) ++ sourceArgs
 
   private def versionArgs = version match {
@@ -26,7 +30,7 @@ case class Gem(name: String, version: Option[String], source: Option[String]) {
 
 case class GemInstaller(jRubyHome: File,
                         gemDir: File,
-                        classpath: List[String],
+                        classpath: List[File],
                         outputStrategy: OutputStrategy) extends JRuby {
   gemDir.mkdirs()
 

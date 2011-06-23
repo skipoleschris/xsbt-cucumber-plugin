@@ -8,7 +8,7 @@ import sbt.OutputStrategy
  */
 case class JRubySettings(jRubyHome: File,
                          gemDir: File,
-                         classpath: List[String],
+                         classpath: List[File],
                          maxMemory: String,
                          maxPermGen: String,
                          outputStrategy: OutputStrategy)

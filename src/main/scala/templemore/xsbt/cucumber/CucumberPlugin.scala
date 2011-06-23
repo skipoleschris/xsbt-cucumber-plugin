@@ -3,14 +3,14 @@ package templemore.xsbt.cucumber
 import sbt._
 import Keys._
 import Project.Initialize
-import templemore.jruby.JRubyDependencies
+import templemore.jruby.{Cucumber, GemInstaller, JRubyDependencies}
 
 /**
  * @author Chris Turner
  */
-object CucumberPlugin extends Plugin with JRubyDependencies {
+object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependencies {
 
-  val cucumber = InputKey[Unit]("cucumber")
+  val cucumber = InputKey[Int]("cucumber")
   val cucumberMode = SettingKey[CucumberMode]("cucumber-mode")
 
   val cucumberJRubyHome = TaskKey[File]("cucumber-jruby-home")
@@ -19,6 +19,7 @@ object CucumberPlugin extends Plugin with JRubyDependencies {
   val cucumberMaxPermGen = SettingKey[String]("cucumber-jruby-max-perm-gen")
 
   val cucumberVersion = SettingKey[String]("cucumber-version")
+  val cucumberCuke4DukeVersion = SettingKey[String]("cucumber-cuke4duke-version")
   val cucumberPrawnVersion = SettingKey[String]("cucumber-prawn-version")
   val cucumberGemUrl = SettingKey[String]("cucumber-gem-url")
   val cucumberForceGemReload = SettingKey[Boolean]("cucumber-force-gem-reload")
@@ -26,52 +27,36 @@ object CucumberPlugin extends Plugin with JRubyDependencies {
   val cucumberFeaturesDir = SettingKey[File]("cucumber-features-directory")
   val cucumberOptions = SettingKey[Seq[String]]("cucumber-options")
 
+  val cucumberHtmlReportFile = SettingKey[File]("cucumber-html-report")
+  val cucumberPdfReportFile = SettingKey[File]("cucumber-pdf-report")
+
   val cucumberJRubySettings = TaskKey[JRubySettings]("cucumber-jruby-settings")
   val cucumberGemSettings = TaskKey[GemSettings]("cucumber-gem-settings")
   val cucumberTestSettings = TaskKey[CucumberSettings]("cucumber-settings")
 
   protected def cucumberTask(argTask: TaskKey[Seq[String]]) =
-    (argTask, cucumberJRubySettings, cucumberGemSettings, cucumberTestSettings) map {
-      (args: Seq[String], jRubySettings, gemSettings, cukeSettings) => {
-        println("Cucumber task")
-        println("JRuby Settings: " + jRubySettings)
-        println("Gem Settings: " + gemSettings)
-        println("Cuke Settings: " + cukeSettings)
-        println("Argumens: ")
-        args foreach println
-      }
-    }
+    (argTask, cucumberJRubySettings, cucumberGemSettings, cucumberTestSettings, streams) map(testWithCucumber)
 
   protected def jRubySettingsTask: Initialize[Task[JRubySettings]] =
-    (cucumberJRubyHome, cucumberGemDir, cucumberMaxMemory, cucumberMaxPermGen) map {
-      (home, gems, mem, permGen) => {
-        //TODO: Need to use the JRuby classpath
-        //TODO: Need to pass a logger instance
-        JRubySettings(home, gems, List[String](), mem, permGen, StdoutOutput)
+    (cucumberJRubyHome, cucumberGemDir, managedClasspath in cucumberJRubySettings,
+     cucumberMaxMemory, cucumberMaxPermGen, streams) map {
+      (home, gems, cp, mem, permGen, s) => {
+        JRubySettings(home, gems, cp.toList.map(_.data), mem, permGen, LoggedOutput(s.log))
       }
     }
 
   protected def gemSettingsTask: Initialize[Task[GemSettings]] =
-    (cucumberVersion, cucumberPrawnVersion, cucumberGemUrl, cucumberForceGemReload) map {
-      (cv, pv, gs, fr) => GemSettings(cv, pv, gs, fr)
+    (cucumberVersion, cucumberCuke4DukeVersion, cucumberPrawnVersion, cucumberGemUrl, cucumberForceGemReload) map {
+      (cv, cdv, pv, gs, fr) => GemSettings(cv, cdv, pv, gs, fr)
     }
 
   protected def cucumberSettingsTask: Initialize[Task[CucumberSettings]] =
-    (cucumberFeaturesDir, cucumberOptions, cucumberMode) map {
-      (fd, o, m) => {
-        //TODO: Need to use the required path
-        CucumberSettings(fd, List[String](), optionsForMode(m) ++ o)
+    (cucumberFeaturesDir, fullClasspath in Test, cucumberOptions,
+     cucumberMode, cucumberHtmlReportFile, cucumberPdfReportFile) map {
+      (fd, cp, o, m, htmlRF, pdfRF) => {
+        CucumberSettings(fd, cp.toList.map(_.data), optionsForMode(m, htmlRF, pdfRF) ++ o)
       }
     }
-
-  private def optionsForMode(mode: CucumberMode) = mode match {
-    case Developer => List[String]()
-    case HtmlReport => List[String]()
-    case PdfReport => List[String]()
-    case _ => List[String]()
-  }
-
-  private def jRubyBaseDir = new File(System.getProperty("user.home"), ".jruby")
 
   private val cucumberConfig = config("cucumber") hide
 
@@ -94,11 +79,18 @@ object CucumberPlugin extends Plugin with JRubyDependencies {
     cucumberMaxPermGen := "64M",
 
     cucumberVersion := "1.0.0",
+    cucumberCuke4DukeVersion := "0.4.4",
     cucumberPrawnVersion := "0.8.4",
     cucumberGemUrl := "http://rubygems.org/",
     cucumberForceGemReload := false,
 
     cucumberFeaturesDir <<= (baseDirectory) { _ / "features" },
-    cucumberOptions := List[String]()
+    cucumberHtmlReportFile <<= (target) { _ / "cucumber-report" / "cucumber.html" },
+    cucumberPdfReportFile <<= (target) { _ / "cucumber-report" / "cucumber.pdf" },
+    cucumberOptions := List[String](),
+
+    managedClasspath in cucumberJRubySettings <<= (classpathTypes, update) map {
+      (ct, updateReport) => Classpaths.managedJars(cucumberConfig, ct, updateReport)
+    }
   )
 }
