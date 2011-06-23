@@ -38,7 +38,7 @@ object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependen
     (argTask, cucumberJRubySettings, cucumberGemSettings, cucumberTestSettings, streams) map(testWithCucumber)
 
   protected def jRubySettingsTask: Initialize[Task[JRubySettings]] =
-    (cucumberJRubyHome, cucumberGemDir, managedClasspath in cucumberJRubySettings,
+    (cucumberJRubyHome, cucumberGemDir, fullClasspath in Test,
      cucumberMaxMemory, cucumberMaxPermGen, streams) map {
       (home, gems, cp, mem, permGen, s) => {
         JRubySettings(home, gems, cp.toList.map(_.data), mem, permGen, LoggedOutput(s.log))
@@ -51,17 +51,14 @@ object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependen
     }
 
   protected def cucumberSettingsTask: Initialize[Task[CucumberSettings]] =
-    (cucumberFeaturesDir, fullClasspath in Test, cucumberOptions,
+    (cucumberFeaturesDir, classDirectory in Test, cucumberOptions,
      cucumberMode, cucumberHtmlReportFile, cucumberPdfReportFile) map {
-      (fd, cp, o, m, htmlRF, pdfRF) => {
-        CucumberSettings(fd, cp.toList.map(_.data), optionsForMode(m, htmlRF, pdfRF) ++ o)
+      (fd, cd, o, m, htmlRF, pdfRF) => {
+        CucumberSettings(fd, cd, optionsForMode(m, htmlRF, pdfRF) ++ o)
       }
     }
 
-  private val cucumberConfig = config("cucumber") hide
-
   val cucumberSettings = Seq(
-    ivyConfigurations += cucumberConfig,
     resolvers ++= jRubyResolvers,
     libraryDependencies ++= jRubyDependencies,
 
@@ -87,10 +84,6 @@ object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependen
     cucumberFeaturesDir <<= (baseDirectory) { _ / "features" },
     cucumberHtmlReportFile <<= (target) { _ / "cucumber-report" / "cucumber.html" },
     cucumberPdfReportFile <<= (target) { _ / "cucumber-report" / "cucumber.pdf" },
-    cucumberOptions := List[String](),
-
-    managedClasspath in cucumberJRubySettings <<= (classpathTypes, update) map {
-      (ct, updateReport) => Classpaths.managedJars(cucumberConfig, ct, updateReport)
-    }
+    cucumberOptions := List[String]()
   )
 }

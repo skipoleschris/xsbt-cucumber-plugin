@@ -19,7 +19,6 @@ private[jruby] trait JRuby {
 
   protected def jruby(arguments: List[String]): Int = {
     val args = jvmArgs ++ ("org.jruby.Main" :: arguments)
-    println("Calling JRuby: " + args.mkString(" "))
     Fork.java(None, args, None, jRubyEnv, outputStrategy)
   }
 

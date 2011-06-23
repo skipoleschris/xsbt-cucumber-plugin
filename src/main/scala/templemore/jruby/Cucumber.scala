@@ -19,12 +19,11 @@ case class Cucumber(jRubyHome: File,
 
   protected val javaOpts = List("-Dcuke4duke.objectFactory=cuke4duke.internal.jvmclass.PicoFactory")
 
-  def cuke(featuresDir: File, testCompileClasspath: List[File], options: List[String] = List(),
+  def cuke(featuresDir: File, requirePath: File, options: List[String] = List(),
            tags: List[String] = List(), names: List[String] = List()): Int = {
     def cuke4duke = (gemDir / "bin" / "cuke4duke").getPath
 
-//    jruby( (cuke4duke :: featuresDir.getPath :: "--require" :: makeClasspath(testCompileClasspath) :: "--color" :: Nil) ++
-//           options ++ makeOptionsList(tags, "--tags") ++ makeOptionsList(names, "--names") )
-    jruby( (cuke4duke :: "--help" :: Nil ) )
+    jruby( (cuke4duke :: featuresDir.getPath :: "--require" :: requirePath.getPath :: "--color" :: Nil) ++
+           options ++ makeOptionsList(tags, "--tags") ++ makeOptionsList(names, "--names") )
   }
 }

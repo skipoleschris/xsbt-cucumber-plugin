@@ -11,7 +11,7 @@ trait JRubyDependencies {
   private val cuke4DukeVersion = "0.4.4"
   private val picoContainerVersion = "2.11.2"
 
-  def jRubyDependencies = Seq("org.jruby" % "jruby-complete" % jrubyVersion % "cucumber->default",
+  def jRubyDependencies = Seq("org.jruby" % "jruby-complete" % jrubyVersion % "test",
                               "cuke4duke" % "cuke4duke" % cuke4DukeVersion % "test",
                               "org.picocontainer" % "picocontainer" % picoContainerVersion % "test")
 
