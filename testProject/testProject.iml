@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="scala" name="Scala">
+      <configuration>
+        <option name="compilerLibraryLevel" value="Project" />
+        <option name="compilerLibraryName" value="Scala 2.9.0-1" />
+        <option name="deprecationWarnings" value="true" />
+        <option name="explainTypeErrors" value="true" />
+        <option name="uncheckedWarnings" value="true" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/target/scala-2.9.0.1/classes" />
+    <output-test url="file://$MODULE_DIR$/target/scala-2.9.0.1/test-classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../testProjects/testProject">
+      <sourceFolder url="file://$MODULE_DIR$/../testProjects/testProject/src/main/scala" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../testProjects/testProject/features" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../testProjects/testProject/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../testProjects/testProject/src/test/resources" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../testProjects/testProject/src/test/scala" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/../testProjects/testProject/project/boot" />
+      <excludeFolder url="file://$MODULE_DIR$/project/plugins/project" />
+      <excludeFolder url="file://$MODULE_DIR$/../testProjects/testProject/project/plugins/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../testProjects/testProject/project/target" />
+      <excludeFolder url="file://$MODULE_DIR$/../testProjects/testProject/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Scala 2.9.0-1" level="project" />
+    <orderEntry type="library" name="Scalatest 1.5" level="project" />
+  </component>
+</module>
+
