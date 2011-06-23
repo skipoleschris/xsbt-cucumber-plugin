@@ -7,4 +7,7 @@ import java.io.File
  */
 case class CucumberSettings(featuresDir: File,
                             requiredPath: File,
-                            options: List[String])
+                            options: List[String]) {
+
+  def featuresPresent = featuresDir.exists
+}

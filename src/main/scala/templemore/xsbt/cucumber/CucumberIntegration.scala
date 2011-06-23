@@ -29,12 +29,19 @@ trait CucumberIntegration {
                                  cukeSettings: CucumberSettings,
                                  s: TaskStreams[_]) = {
     val log = s.log
-    log.debug("JRuby Settings: %s" format(jRubySettings))
-    log.debug("Gem Settings: %s" format(gemSettings))
-    log.debug("Cucumber Options: %s" format(cukeSettings))
 
-    installGems(jRubySettings, gemSettings, log)
-    runCucumber(args, jRubySettings, cukeSettings, log)
+    if ( cukeSettings.featuresPresent ) {
+      log.debug("JRuby Settings: %s" format(jRubySettings))
+      log.debug("Gem Settings: %s" format(gemSettings))
+      log.debug("Cucumber Options: %s" format(cukeSettings))
+
+      installGems(jRubySettings, gemSettings, log)
+      runCucumber(args, jRubySettings, cukeSettings, log)
+    }
+    else {
+      log.info("No features directory found. Skipping for curent project.")
+      0
+    }
   }
 
   private def installGems(jRubySettings: JRubySettings,
