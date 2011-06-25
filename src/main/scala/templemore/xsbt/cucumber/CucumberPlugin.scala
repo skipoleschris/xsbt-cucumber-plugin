@@ -10,6 +10,8 @@ import templemore.jruby.{Cucumber, GemInstaller, JRubyDependencies}
  */
 object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependencies {
 
+  type LifecycleCallback = () => Unit
+
   val cucumber = InputKey[Int]("cucumber")
   val cucumberMode = SettingKey[CucumberMode]("cucumber-mode")
 
@@ -34,6 +36,11 @@ object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependen
   val cucumberGemSettings = TaskKey[GemSettings]("cucumber-gem-settings")
   val cucumberTestSettings = TaskKey[CucumberSettings]("cucumber-settings")
 
+  val cucumberBefore = SettingKey[LifecycleCallback]("cucumber-before")
+  val cucumberAfter = SettingKey[LifecycleCallback]("cucumber-after")
+
+  val cucumberCleanGems = TaskKey[Unit]("cucumber-clean-gems")
+
   protected def cucumberTask(argTask: TaskKey[Seq[String]]) =
     (argTask, cucumberJRubySettings, cucumberGemSettings, cucumberTestSettings, streams) map(testWithCucumber)
 
@@ -52,11 +59,17 @@ object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependen
 
   protected def cucumberSettingsTask: Initialize[Task[CucumberSettings]] =
     (cucumberFeaturesDir, classDirectory in Test, cucumberOptions,
-     cucumberMode, cucumberHtmlReportFile, cucumberPdfReportFile) map {
-      (fd, cd, o, m, htmlRF, pdfRF) => {
-        CucumberSettings(fd, cd, optionsForMode(m, htmlRF, pdfRF) ++ o)
+     cucumberMode, cucumberHtmlReportFile, cucumberPdfReportFile,
+     cucumberBefore, cucumberAfter) map {
+      (fd, cd, o, m, htmlRF, pdfRF, bf, af) => {
+        CucumberSettings(fd, cd, optionsForMode(m, htmlRF, pdfRF) ++ o, bf, af)
       }
     }
+
+  protected def cleanGemsTask: Initialize[Task[Unit]] = (cucumberJRubySettings) map(cleanGemCache)
+
+  private def defaultBefore() = {}
+  private def defaultAfter() = {}
 
   val cucumberSettings = Seq(
     resolvers ++= jRubyResolvers,
@@ -84,6 +97,11 @@ object CucumberPlugin extends Plugin with CucumberIntegration with JRubyDependen
     cucumberFeaturesDir <<= (baseDirectory) { _ / "features" },
     cucumberHtmlReportFile <<= (target) { _ / "cucumber-report" / "cucumber.html" },
     cucumberPdfReportFile <<= (target) { _ / "cucumber-report" / "cucumber.pdf" },
-    cucumberOptions := List[String]()
+    cucumberOptions := List[String](),
+
+    cucumberBefore := defaultBefore,
+    cucumberAfter := defaultAfter,
+
+    cucumberCleanGems <<= cleanGemsTask
   )
 }

@@ -64,10 +64,23 @@ trait CucumberIntegration {
     def isNotATag(arg: String) = !isATag(arg)
 
     log.info("Running cucumber...")
+    cukeSettings.beforeFunc()
     val cucumber = Cucumber(jRubySettings.jRubyHome, jRubySettings.gemDir,
                             jRubySettings.classpath, jRubySettings.outputStrategy,
                             Some(jRubySettings.maxMemory), Some(jRubySettings.maxPermGen))
-    cucumber.cuke(cukeSettings.featuresDir, cukeSettings.requiredPath,
-                  cukeSettings.options, tagsFromArgs(args), namesFromArgs(args))
+    val result = cucumber.cuke(cukeSettings.featuresDir, cukeSettings.requiredPath,
+                               cukeSettings.options, tagsFromArgs(args), namesFromArgs(args))
+    cukeSettings.afterFunc()
+    result
+  }
+
+  protected def cleanGemCache(jRubySettings: JRubySettings) =
+    deleteDirectoryContents(jRubySettings.jRubyHome)
+
+  private def deleteDirectoryContents(dir: File): Unit = {
+    dir.listFiles().foreach { f =>
+      if ( f.isDirectory ) deleteDirectoryContents(f)
+      f.delete()
+    }
   }
 }
