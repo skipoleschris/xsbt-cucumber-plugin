@@ -12,12 +12,17 @@ Provides the ability to run Cucumber via Cuke4Duke within the SBT environment. O
 
 ## Usage ##
 Install the plugin (see later). Be default features files go in a 'features' directory at the root of the project. Step definitions go in "src/test/scala'. Finally from the sbt console call the task:
+
     cucumber
 
 The cucumber task can be parameterised with tags or feature names to provide fine grained control of which features get executed. E.g.
+
     cucumber @demo,~@in-progress
+
 would run features tagged as @demo and not those tagged as @in-progress. Also:
+
     cucumber "User admin"
+
 would run features with a name matched to "User admin". Multiple arguments can be supplied and honour the following rules:
 
 * arguments starting with @ or ~ will be passed to cucumber using the --tags flag
@@ -98,6 +103,7 @@ The testProjects/multiModuleTestProject in the plugin source repository shows th
 All gems are automatically installed the first time that the cucumber plugin is run. These gems are installed to the default location {user.home}/.jruby/gems so that they are cached for all projects using the cucumber plugin. The location of the cache directory can be overridden in the settings.
 
 A task is provided to delete the cache directory contents:
+
     cucumber-clean-gems
 
 ## Customisation ##
