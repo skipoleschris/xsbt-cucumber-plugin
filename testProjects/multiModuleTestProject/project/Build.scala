@@ -1,14 +1,17 @@
 import sbt._
 import Keys._
+import templemore.xsbt.cucumber.CucumberPlugin
 
 object BuildSettings {
   val buildOrganization = "templemore"
   val buildScalaVersion = "2.9.0-1"
   val buildVersion      = "0.1"
 
-  val buildSettings = Defaults.defaultSettings ++ Seq (organization := buildOrganization,
-                                           scalaVersion := buildScalaVersion,
-                                           version      := buildVersion)
+  val buildSettings = Defaults.defaultSettings ++
+                      Seq (organization := buildOrganization,
+                           scalaVersion := buildScalaVersion,
+                           version      := buildVersion) ++
+                      CucumberPlugin.cucumberSettings
 }
 
 object Dependencies {
@@ -18,7 +21,7 @@ object Dependencies {
   val testDeps = Seq(scalaTest)
 }
 
-object FTUtilsBuild extends Build {
+object TestProjectBuild extends Build {
   import Dependencies._
   import BuildSettings._
 
@@ -27,8 +30,8 @@ object FTUtilsBuild extends Build {
 
 
   lazy val jarProject = Project ("jar-project", file ("jar-project"),
-           settings = buildSettings ++ Seq (libraryDependencies := testDeps))
+           settings = buildSettings ++ Seq (libraryDependencies ++= testDeps))
 
   lazy val warProject = Project ("war-project", file ("war-project"),
-           settings = buildSettings) dependsOn (jarProject)
+           settings = buildSettings ++ Seq (libraryDependencies ++= testDeps)) dependsOn (jarProject)
 }
