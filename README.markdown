@@ -31,6 +31,7 @@ would run features with a name matched to "User admin". Multiple arguments can b
 ## Writing Features ##
 Features are written in text format and are placed in .feature files inside the 'features' directory. For more info on writing features please see the [Cucumber](http://cukes.info) website.
 For example:
+
     Feature: Cucumber
       In order to implement BDD in my Scala project
       As a developer
@@ -46,6 +47,7 @@ The location of the features can be changed by overriding a plugin setting (see 
 ## Writing Step Defitions ##
 Step definitions can be written in Scala, using the cuke4duke Scala DSL. More information on this api can be obtained from the the [cuke4duke wiki page for scala](http://wiki.github.com/aslakhellesoy/cuke4duke/scala).
 For example:
+
     import cuke4duke.{EN, ScalaDsl}
     import org.scalatest.matchers.ShouldMatchers
 
