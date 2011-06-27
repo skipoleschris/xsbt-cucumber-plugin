@@ -5,9 +5,6 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="Scala 2.9.0-1" />
-        <option name="deprecationWarnings" value="true" />
-        <option name="explainTypeErrors" value="true" />
-        <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
   </component>
@@ -21,10 +18,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/scala" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/project/boot" />
-      <excludeFolder url="file://$MODULE_DIR$/project/plugins/project" />
-      <excludeFolder url="file://$MODULE_DIR$/project/plugins/target" />
-      <excludeFolder url="file://$MODULE_DIR$/project/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
