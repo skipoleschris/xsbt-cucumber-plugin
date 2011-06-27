@@ -14,7 +14,6 @@ class CucumberJarSteps extends ScalaDsl with EN with ShouldMatchers {
 
   When("""^the cucumber task is called$""") {
     whenCalled = true
-    // Broken in cuke4duke since cucumber 1.0.0: announce("Hello World")
   }
 
   Then("""^Cucumber is executed against the features and step definitions$""") {
