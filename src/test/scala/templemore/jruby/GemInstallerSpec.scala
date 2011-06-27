@@ -1,10 +1,10 @@
 package templemore.jruby
 
+import sbt._
 import org.scalatest.matchers.MustMatchers
 import sbt.StdoutOutput
 import java.io.File
 import org.scalatest.{BeforeAndAfterEach, FlatSpec}
-import scala.Some
 
 /**
  * @author Chris Turner
@@ -13,6 +13,7 @@ class GemInstallerSpec extends FlatSpec with MustMatchers with BeforeAndAfterEac
 
   private val jRubyHome = new File(System.getProperty("user.dir"), "target")
   private val gemDir = new File(jRubyHome, "gems")
+  private val jRubyJar = new File(System.getProperty("user.home")) / ".ivy2" / "cache" / "org.jruby" / "jruby-complete" / "jars" / "jruby-complete-1.6.1.jar"
   private val cucumberVersion = "1.0.0"
 
   override def beforeEach() {
@@ -23,7 +24,7 @@ class GemInstallerSpec extends FlatSpec with MustMatchers with BeforeAndAfterEac
 
   "A gem installer" should "install the cucumber gem" in {
     val installer = new GemInstaller(jRubyHome, gemDir,
-                                     List("/Users/chris/.ivy2/cache/org.jruby/jruby-complete/jars/jruby-complete-1.6.1.jar"),
+                                     List(jRubyJar),
                                      StdoutOutput)
     installer.installGem(Gem("cucumber", Some(cucumberVersion), Some("http://rubygems.org/")))
 
