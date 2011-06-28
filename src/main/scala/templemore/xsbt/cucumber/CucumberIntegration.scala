@@ -48,8 +48,8 @@ trait CucumberIntegration {
                           gemSettings: GemSettings,
                           log: Logger) = {
     log.info("Installing any missing Gems...")
-    val gemInstaller = GemInstaller(jRubySettings.jRubyHome, jRubySettings.gemDir,
-                                    jRubySettings.classpath, jRubySettings.outputStrategy)
+    val gemInstaller = new GemInstaller(jRubySettings.jRubyHome, jRubySettings.gemDir,
+                                        jRubySettings.classpath, jRubySettings.outputStrategy)
     gemSettings.gems.foreach(gemInstaller.installGem(_, gemSettings.forceReload))
   }
 
