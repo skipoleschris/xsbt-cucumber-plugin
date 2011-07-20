@@ -8,11 +8,17 @@ import java.io.File
 /**
  * @author Chris Turner
  */
-case class Gem(name: String, version: Option[String], source: Option[String]) {
+case class Gem(name: String,
+               version: Option[String],
+               source: Option[String],
+               classifier: Option[String] = None) {
 
   override def toString = version match {
     case None => name
-    case Some(v) => "%s-%s" format(name, v)
+    case Some(v) => classifier match {
+      case None => "%s-%s" format(name, v)
+      case Some(c) => "%s-%s-%s" format(name, v, c)
+    }
   }
 
   def toArgs = (name :: versionArgs) ++ sourceArgs
@@ -28,11 +34,11 @@ case class Gem(name: String, version: Option[String], source: Option[String]) {
   }
 }
 
-case class GemInstaller(jRubyHome: File,
-                        gemDir: File,
-                        classpath: List[File],
-                        outputStrategy: OutputStrategy) extends JRuby {
-  gemDir.mkdirs()
+class GemInstaller(val jRubyHome: File,
+                   val gemDir: File,
+                   val classpath: List[File],
+                   val outputStrategy: OutputStrategy) extends JRuby {
+  IO.createDirectory(gemDir)
 
   protected val javaOpts = List[String]()
 

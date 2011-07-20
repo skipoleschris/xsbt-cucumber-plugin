@@ -14,25 +14,42 @@ class GemInstallerSpec extends FlatSpec with MustMatchers with BeforeAndAfterEac
   private val jRubyHome = new File(System.getProperty("user.dir"), "target")
   private val gemDir = new File(jRubyHome, "gems")
   private val jRubyJar = new File(System.getProperty("user.home")) / ".ivy2" / "cache" / "org.jruby" / "jruby-complete" / "jars" / "jruby-complete-1.6.1.jar"
-  private val cucumberVersion = "1.0.0"
+
+  private val gemName = "json"
+  private val gemVersion = "1.5.3"
 
   override def beforeEach() {
-    if ( gemDir.exists ) deleteAllFiles(gemDir)
-    else gemDir.mkdirs()
+    IO.delete(gemDir)
+    IO.createDirectory(gemDir)
   }
 
+  "A gem installer" should "install the test gem" in {
+    installTestGem()
+    gemDirectory.exists() must be(true)
+  }
 
-  "A gem installer" should "install the cucumber gem" in {
+  it should "not install the test gem if it is already present" in {
+    installTestGem()
+    val timestamp = gemFile.lastModified()
+    installTestGem()
+    gemFile.lastModified() must be(timestamp)
+  }
+
+  it should "force install the test gem even if it is already present" in {
+    installTestGem()
+    val timestamp = gemFile.lastModified()
+    installTestGem(true)
+    gemFile.lastModified() must not be(timestamp)
+  }
+
+  private def gemDirectory = gemDir / "gems" / "%s-%s-java".format(gemName, gemVersion)
+  private def gemFile = gemDirectory / "lib" / "json.rb"
+
+  private def installTestGem(force: Boolean = false) {
     val installer = new GemInstaller(jRubyHome, gemDir,
                                      List(jRubyJar),
                                      StdoutOutput)
-    installer.installGem(Gem("cucumber", Some(cucumberVersion), Some("http://rubygems.org/")))
-
-    new File(gemDir, "gems/cucumber-" + cucumberVersion).exists() must be(true)
-  }
-
-  private def deleteAllFiles(dir: File): Unit = dir.listFiles.foreach { f =>
-    if ( f.isDirectory ) deleteAllFiles(f)
-    f.delete()
+    val gem = Gem(gemName, Some(gemVersion), Some("http://rubygems.org/"), Some("java"))
+    installer.installGem(gem, force)
   }
 }
