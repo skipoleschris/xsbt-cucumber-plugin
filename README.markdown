@@ -5,7 +5,7 @@ An [sbt 0.10](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber]
 
 Provides the ability to run Cucumber via Cuke4Duke within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
 
-* Works with xsbt 0.10
+* Works with xsbt 0.10.1
 * Works with Cucumber 1.0.0
 * Works with cuke4duke 0.4.4
 * Allows projects compiled and running against Scala 2.8.x and 2.9.x
@@ -151,6 +151,9 @@ The four supported modes are:
 This plugin will continue to track releases of both SBT (0.10 and onwards) and Cucumber. Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.2 ###
+Updated to be compatible with SBT 0.10.1 release. This release contains no code changes, it is just a recompilation with the build properties updated.
 
 ### 0.1 ###
 Initial release. Complete rewrite of the plugin to support SBT 0.10.
