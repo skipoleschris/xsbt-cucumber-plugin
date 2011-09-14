@@ -24,6 +24,6 @@ case class Cucumber(jRubyHome: File,
     def cuke4duke = (gemDir / "bin" / "cuke4duke").getPath
 
     jruby( (cuke4duke :: featuresDir.getPath :: "--require" :: requirePath.getPath :: "--color" :: Nil) ++
-           options ++ makeOptionsList(tags, "--tags") ++ makeOptionsList(names, "--names") )
+           options ++ makeOptionsList(tags, "--tags") ++ makeOptionsList(names, "--name") )
   }
 }
