@@ -75,7 +75,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    libraryDependencies += "templemore" %% "xsbt-cucumber-plugin" % "0.1"
+    libraryDependencies += "templemore" %% "xsbt-cucumber-plugin" % "0.2"
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
