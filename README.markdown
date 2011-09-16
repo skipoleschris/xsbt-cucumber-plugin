@@ -75,7 +75,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    libraryDependencies += "templemore" %% "xsbt-cucumber-plugin" % "0.2"
+    libraryDependencies += "templemore" %% "xsbt-cucumber-plugin" % "0.3"
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -148,9 +148,15 @@ The four supported modes are:
 
 ## Roadmap ##
 
-This plugin will continue to track releases of both SBT (0.10 and onwards) and Cucumber. Requests for features can be posted to the issues list or emailed to the author.
+This plugin will continue to track releases of both SBT (0.10 and onwards) and Cucumber.
+Requests for features can be posted to the issues list or emailed to the author.
+
+Current plan is to upgrade to the next major version of SBT and then to switch to cucumber-jvm as soon as there is a stable release.
 
 ## Release History ##
+
+### 0.3 ###
+Bug fix to correct --names parameter which should in fact be --name. Thanks to https://github.com/zvozin for the patch.
 
 ### 0.2 ###
 Updated to be compatible with SBT 0.10.1 release. This release contains no code changes, it is just a recompilation with the build properties updated.
