@@ -39,9 +39,6 @@
     <breakpoint_rules />
     <ui_properties />
   </component>
-  <component name="DependencyValidationManager">
-    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
-  </component>
   <component name="IdProvider" IDEtalkID="2E5BB5757E63386E78A9AE4B4B99B602" />
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />

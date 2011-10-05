@@ -7,7 +7,7 @@ import sbt._
  */
 trait JRubyDependencies {
 
-  private val jrubyVersion = "1.6.1"
+  private val jrubyVersion = "1.6.4"
   private val cuke4DukeVersion = "0.4.4"
   private val picoContainerVersion = "2.11.2"
 

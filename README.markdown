@@ -1,7 +1,7 @@
 xsbt-cucumber-plugin
 ====================
 
-An [sbt 0.10](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features under [cuke4duke](http://github.com/aslakhellesoy/cuke4duke).
+An [sbt 0.11.0](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features under [cuke4duke](http://github.com/aslakhellesoy/cuke4duke).
 
 Provides the ability to run Cucumber via Cuke4Duke within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
 
