@@ -1,14 +1,14 @@
 xsbt-cucumber-plugin
 ====================
 
-An [sbt 0.10](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features under [cuke4duke](http://github.com/aslakhellesoy/cuke4duke).
+An [sbt 0.11.0](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features under [cuke4duke](http://github.com/aslakhellesoy/cuke4duke).
 
 Provides the ability to run Cucumber via Cuke4Duke within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
 
-* Works with xsbt 0.10.1
+* Works with xsbt 0.11.0
 * Works with Cucumber 1.0.0
 * Works with cuke4duke 0.4.4
-* Allows projects compiled and running against Scala 2.8.x and 2.9.x
+* Allows projects compiled and running against Scala 2.9.1
 
 ## Usage ##
 Install the plugin (see later). Be default features files go in a 'features' directory at the root of the project. Step definitions go in "src/test/scala'. Finally from the sbt console call the task:
@@ -75,7 +75,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    libraryDependencies += "templemore" %% "xsbt-cucumber-plugin" % "0.3"
+    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.4")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -154,6 +154,9 @@ Requests for features can be posted to the issues list or emailed to the author.
 Current plan is to upgrade to the next major version of SBT and then to switch to cucumber-jvm as soon as there is a stable release.
 
 ## Release History ##
+
+### 0.4 ###
+Updated to support xsbt 0.11.0 & scala 2.9.1
 
 ### 0.3 ###
 Bug fix to correct --names parameter which should in fact be --name. Thanks to https://github.com/zvozin for the patch.

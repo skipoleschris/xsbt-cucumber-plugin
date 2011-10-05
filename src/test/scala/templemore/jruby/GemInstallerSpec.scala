@@ -13,7 +13,7 @@ class GemInstallerSpec extends FlatSpec with MustMatchers with BeforeAndAfterEac
 
   private val jRubyHome = new File(System.getProperty("user.dir"), "target")
   private val gemDir = new File(jRubyHome, "gems")
-  private val jRubyJar = new File(System.getProperty("user.home")) / ".ivy2" / "cache" / "org.jruby" / "jruby-complete" / "jars" / "jruby-complete-1.6.1.jar"
+  private val jRubyJar = new File(System.getProperty("user.home")) / ".ivy2" / "cache" / "org.jruby" / "jruby-complete" / "jars" / "jruby-complete-1.6.4.jar"
 
   private val gemName = "json"
   private val gemVersion = "1.5.3"
