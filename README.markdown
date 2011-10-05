@@ -155,6 +155,9 @@ Current plan is to upgrade to the next major version of SBT and then to switch t
 
 ## Release History ##
 
+### 0.4 ###
+Updated to support xsbt 0.11.0 & scala 2.9.1
+
 ### 0.3 ###
 Bug fix to correct --names parameter which should in fact be --name. Thanks to https://github.com/zvozin for the patch.
 
