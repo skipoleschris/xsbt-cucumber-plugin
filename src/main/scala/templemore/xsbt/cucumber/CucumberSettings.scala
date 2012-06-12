@@ -1,15 +1,14 @@
 package templemore.xsbt.cucumber
 
 import java.io.File
+import sbt.OutputStrategy
 
 /**
  * @author Chris Turner
  */
-case class CucumberSettings(featuresDir: File,
-                            requiredPath: File,
-                            options: List[String],
-                            beforeFunc: () => Unit,
-                            afterFunc: () => Unit) {
+case class CucumberSettings(cucumberVersion: String,
+                            maxMemory: String,
+                            maxPermGen: String,
+                            classpath: List[File],
+                            outputStrategy: OutputStrategy)
 
-  def featuresPresent = featuresDir.exists
-}
