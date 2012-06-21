@@ -11,3 +11,5 @@ libraryDependencies ++= Seq(
 )
 
 seq(cucumberSettings : _*)
+
+cucumberStepsBasePackage := "test"

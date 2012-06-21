@@ -6,8 +6,7 @@ import sbt.OutputStrategy
 /**
  * @author Chris Turner
  */
-case class CucumberSettings(cucumberVersion: String,
-                            maxMemory: String,
+case class CucumberSettings(maxMemory: String,
                             maxPermGen: String,
                             classpath: List[File],
                             outputStrategy: OutputStrategy)

@@ -6,7 +6,7 @@ import java.io.File
  * @author Chris Turner
  */
 case class CucumberOptions(featuresDir: File,
-                           requiredPath: File,
+                           basePackage: String,
                            options: List[String],
                            beforeFunc: () => Unit,
                            afterFunc: () => Unit) {

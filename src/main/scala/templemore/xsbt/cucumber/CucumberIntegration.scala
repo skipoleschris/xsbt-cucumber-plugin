@@ -50,7 +50,7 @@ trait CucumberIntegration {
     cucumberOptions.beforeFunc()
     val cucumber = Cucumber(cucumberSettings.classpath, cucumberSettings.outputStrategy,
                             Some(cucumberSettings.maxMemory), Some(cucumberSettings.maxPermGen))
-    val result = cucumber.cuke(cucumberOptions.featuresDir, cucumberOptions.requiredPath,
+    val result = cucumber.cuke(cucumberOptions.featuresDir, cucumberOptions.basePackage,
                                cucumberOptions.options, tagsFromArgs(args), namesFromArgs(args))
     cucumberOptions.afterFunc()
     result

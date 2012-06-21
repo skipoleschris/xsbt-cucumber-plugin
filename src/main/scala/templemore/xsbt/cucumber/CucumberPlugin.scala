@@ -7,7 +7,10 @@ import Project.Initialize
 /**
  * @author Chris Turner
  */
-object CucumberPlugin extends Plugin with CucumberIntegration with CucumberDependencies {
+object CucumberPlugin extends Plugin with CucumberIntegration {
+
+  private val CucumberVersionForScala2_9 = "1.0.9"
+  private val CucumberVersionForScala2_10 = "1.0.10"
 
   type LifecycleCallback = () => Unit
 
@@ -15,11 +18,11 @@ object CucumberPlugin extends Plugin with CucumberIntegration with CucumberDepen
   val cucumberTestSettings = TaskKey[CucumberSettings]("cucumber-settings")
   val cucumberOptions = TaskKey[CucumberOptions]("cucumber-options")
 
-  val cucumberVersion = SettingKey[String]("cucumber-version")
   val cucumberMaxMemory = SettingKey[String]("cucumber-max-memory")
   val cucumberMaxPermGen = SettingKey[String]("cucumber-max-perm-gen")
 
   val cucumberFeaturesDir = SettingKey[File]("cucumber-features-directory")
+  val cucumberStepsBasePackage = SettingKey[String]("cucumber-steps-base-package")
   val cucumberExtraOptions = SettingKey[Seq[String]]("cucumber-extra-options")
   val cucumberMode = SettingKey[CucumberMode]("cucumber-mode")
   val cucumberHtmlReportFile = SettingKey[File]("cucumber-html-report")
@@ -30,25 +33,30 @@ object CucumberPlugin extends Plugin with CucumberIntegration with CucumberDepen
     (argTask, cucumberTestSettings, cucumberOptions, streams) map(testWithCucumber)
 
   protected def cucumberSettingsTask: Initialize[Task[CucumberSettings]] =
-    (cucumberVersion, cucumberMaxMemory, cucumberMaxPermGen, fullClasspath in Test, streams) map {
-      (v, mm, mpg, cp, s) => {
-        CucumberSettings(v, mm, mpg, cp.toList.map(_.data), LoggedOutput(s.log))
+    (cucumberMaxMemory, cucumberMaxPermGen, fullClasspath in Test, streams) map {
+      (mm, mpg, cp, s) => {
+        CucumberSettings(mm, mpg, cp.toList.map(_.data), LoggedOutput(s.log))
       }
     }
 
   protected def cucumberOptionsTask: Initialize[Task[CucumberOptions]] =
-    (cucumberFeaturesDir, classDirectory in Test, cucumberExtraOptions,
+    (cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
      cucumberMode, cucumberHtmlReportFile, cucumberBefore, cucumberAfter) map {
-      (fd, cd, o, m, htmlRF, bf, af) => {
-        CucumberOptions(fd, cd, optionsForMode(m, htmlRF) ++ o, bf, af)
+      (fd, bp, o, m, htmlRF, bf, af) => {
+        CucumberOptions(fd, bp, optionsForMode(m, htmlRF) ++ o, bf, af)
       }
     }
 
   private def defaultBefore() = {}
   private def defaultAfter() = {}
 
+  private def cucumberVersion(scalaVersion: String) = 
+    if ( scalaVersion.startsWith("2.10") ) CucumberVersionForScala2_10 else CucumberVersionForScala2_9
+
   val cucumberSettings = Seq(
-    libraryDependencies ++= cucumberDependencies,
+    libraryDependencies <+= scalaVersion { sv =>
+      "info.cukes" % "cucumber-scala" % cucumberVersion(sv) % "test"      
+    },
 
     cucumber <<= inputTask(cucumberTask),
     cucumberTestSettings <<= cucumberSettingsTask,
@@ -58,9 +66,9 @@ object CucumberPlugin extends Plugin with CucumberIntegration with CucumberDepen
 
     cucumberMaxMemory := "256M",
     cucumberMaxPermGen := "64M",
-    cucumberVersion := "1.0.9",
 
-    cucumberFeaturesDir <<= (baseDirectory) { _ / "features" },
+    cucumberFeaturesDir <<= (baseDirectory) { _ / "src" / "test" / "features" },
+    cucumberStepsBasePackage := "",
     cucumberHtmlReportFile <<= (target) { _ / "cucumber-report" / "cucumber.html" },
     cucumberExtraOptions := List[String](),
 
