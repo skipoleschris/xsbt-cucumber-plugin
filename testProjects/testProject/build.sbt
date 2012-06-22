@@ -14,8 +14,8 @@ seq(cucumberSettings : _*)
 
 cucumberStepsBasePackage := "test"
 
-cucumberHtmlReportDir <<= (target) { d => Some(d / "cucumber-report") }
+cucumberHtmlReport := true
 
-cucumberJsonReportFile <<= (target) { f => Some(f / "cucumber.json") }
+cucumberJunitReport := true 
 
-cucumberJunitReportFile <<= (target) { f => Some(f / "cucumber-junit.xml") }
+cucumberJsonReport := true

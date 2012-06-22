@@ -8,32 +8,19 @@ import std.TaskStreams
  */
 trait CucumberIntegration {
 
-  protected def optionsForReporting(htmlReportDir: Option[File],
-                                    jsonReportFile: Option[File],
-                                    junitReportFile: Option[File]): List[String] = {
-    (Some("--format" :: "pretty" :: Nil) ::
-     (htmlReportDir map { dir => 
-       dir.mkdirs()
-       "--format" :: "html:%s".format(dir.getPath) :: Nil }) ::
-     (jsonReportFile map { file => 
-       file.getParentFile.mkdirs()
-       "--format" :: "json-pretty:%s".format(file.getPath) :: Nil }) ::
-     (junitReportFile map { file => 
-       file.getParentFile.mkdirs()
-       "--format" :: "junit:%s".format(file.getPath) :: Nil }) :: Nil).flatten.flatten
-  }
-
   protected def testWithCucumber(args: Seq[String],
                                  cucumberSettings: CucumberSettings,
                                  cucumberOptions: CucumberOptions,
+                                 cucumberOutput: CucumberOutput,
                                  s: TaskStreams[_]) = {
     val log = s.log
 
     if ( cucumberOptions.featuresPresent ) {
       log.debug("Cucumber Settings: %s".format(cucumberSettings))
       log.debug("Cucumber Options: %s".format(cucumberOptions))
+      log.debug("Cucumber Output: %s".format(cucumberOutput))
 
-      runCucumber(args, cucumberSettings, cucumberOptions, log)
+      runCucumber(args, cucumberSettings, cucumberOptions, cucumberOutput, log)
     }
     else {
       log.info("No features directory found. Skipping for curent project.")
@@ -44,6 +31,7 @@ trait CucumberIntegration {
   private def runCucumber(args: Seq[String],
                           cucumberSettings: CucumberSettings,
                           cucumberOptions: CucumberOptions,
+                          cucumberOutput: CucumberOutput,
                           log: Logger) = {
     def tagsFromArgs(args: Seq[String]) = args.filter(isATag).toList
     def namesFromArgs(args: Seq[String]) = args.filter(isNotATag).toList
@@ -56,7 +44,7 @@ trait CucumberIntegration {
     val cucumber = Cucumber(cucumberSettings.classpath, cucumberSettings.outputStrategy,
                             Some(cucumberSettings.maxMemory), Some(cucumberSettings.maxPermGen))
     val result = cucumber.cuke(cucumberOptions.featuresDir, cucumberOptions.basePackage,
-                               cucumberOptions.options, tagsFromArgs(args), namesFromArgs(args))
+                               cucumberOptions.options ++ cucumberOutput.options, tagsFromArgs(args), namesFromArgs(args))
     cucumberOptions.afterFunc()
     result
   }

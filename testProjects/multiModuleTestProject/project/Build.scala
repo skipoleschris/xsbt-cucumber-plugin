@@ -11,7 +11,9 @@ object BuildSettings {
                       Seq (organization := buildOrganization,
                            scalaVersion := buildScalaVersion,
                            version      := buildVersion) ++
-                      CucumberPlugin.cucumberSettings
+                      CucumberPlugin.cucumberSettings ++
+                      Seq (CucumberPlugin.cucumberHtmlReport := true,
+                           CucumberPlugin.cucumberPrettyReport := true)
 }
 
 object Dependencies {

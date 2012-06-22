@@ -17,23 +17,30 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
   val cucumber = InputKey[Int]("cucumber")
   val cucumberTestSettings = TaskKey[CucumberSettings]("cucumber-settings")
   val cucumberOptions = TaskKey[CucumberOptions]("cucumber-options")
+  val cucumberOutput = TaskKey[CucumberOutput]("cucumber-output")
 
   val cucumberMaxMemory = SettingKey[String]("cucumber-max-memory")
   val cucumberMaxPermGen = SettingKey[String]("cucumber-max-perm-gen")
 
   val cucumberFeaturesDir = SettingKey[File]("cucumber-features-directory")
   val cucumberStepsBasePackage = SettingKey[String]("cucumber-steps-base-package")
-  val cucumberExtraOptions = SettingKey[Seq[String]]("cucumber-extra-options")
+  val cucumberExtraOptions = SettingKey[List[String]]("cucumber-extra-options")
 
-  val cucumberHtmlReportDir = SettingKey[Option[File]]("cucumber-html-report")
-  val cucumberJsonReportFile = SettingKey[Option[File]]("cucumber-json-report")
-  val cucumberJunitReportFile = SettingKey[Option[File]]("cucumber-junit-report")
+  val cucumberPrettyReport = SettingKey[Boolean]("cucumber-pretty-report")
+  val cucumberHtmlReport = SettingKey[Boolean]("cucumber-html-report")
+  val cucumberJunitReport = SettingKey[Boolean]("cucumber-junit-report")
+  val cucumberJsonReport = SettingKey[Boolean]("cucumber-json-report")
+
+  val cucumberPrettyReportFile = SettingKey[File]("cucumber-pretty-report-file")
+  val cucumberHtmlReportDir = SettingKey[File]("cucumber-html-report-dir")
+  val cucumberJsonReportFile = SettingKey[File]("cucumber-json-report-file")
+  val cucumberJunitReportFile = SettingKey[File]("cucumber-junit-report-file")
 
   val cucumberBefore = SettingKey[LifecycleCallback]("cucumber-before")
   val cucumberAfter = SettingKey[LifecycleCallback]("cucumber-after")
 
   protected def cucumberTask(argTask: TaskKey[Seq[String]]) =
-    (argTask, cucumberTestSettings, cucumberOptions, streams) map(testWithCucumber)
+    (argTask, cucumberTestSettings, cucumberOptions, cucumberOutput, streams) map(testWithCucumber)
 
   protected def cucumberSettingsTask: Initialize[Task[CucumberSettings]] =
     (cucumberMaxMemory, cucumberMaxPermGen, fullClasspath in Test, streams) map {
@@ -44,10 +51,17 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
 
   protected def cucumberOptionsTask: Initialize[Task[CucumberOptions]] =
     (cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
-     cucumberHtmlReportDir, cucumberJsonReportFile, cucumberJunitReportFile,
      cucumberBefore, cucumberAfter) map {
-      (fd, bp, o, htmlRD, jsonRF, junitRF, bf, af) => {
-        CucumberOptions(fd, bp, optionsForReporting(htmlRD, jsonRF, junitRF) ++ o, bf, af)
+      (fd, bp, o, bf, af) => {
+        CucumberOptions(fd, bp, o, bf, af)
+      }
+    }
+
+  protected def cucumberOutputTask: Initialize[Task[CucumberOutput]] =
+    (cucumberPrettyReport, cucumberHtmlReport, cucumberJunitReport, cucumberJsonReport,
+     cucumberPrettyReportFile, cucumberHtmlReportDir, cucumberJunitReportFile, cucumberJsonReportFile) map {
+      (pR, hR, juR, jsR, pRF, hRD, juRF, jsRF) => {
+        CucumberOutput(pR, hR, juR, jsR, pRF, hRD, juRF, jsRF)
       }
     }
 
@@ -65,6 +79,7 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
     cucumber <<= inputTask(cucumberTask),
     cucumberTestSettings <<= cucumberSettingsTask,
     cucumberOptions <<= cucumberOptionsTask,
+    cucumberOutput <<= cucumberOutputTask,
 
     cucumberMaxMemory := "256M",
     cucumberMaxPermGen := "64M",
@@ -73,9 +88,15 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
     cucumberStepsBasePackage := "",
     cucumberExtraOptions := List[String](),
 
-    cucumberHtmlReportDir := None,
-    cucumberJsonReportFile := None,
-    cucumberJunitReportFile := None,
+    cucumberPrettyReport := false,
+    cucumberHtmlReport := false,
+    cucumberJunitReport := false,
+    cucumberJsonReport := false,
+
+    cucumberPrettyReportFile <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber.txt" },
+    cucumberHtmlReportDir <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber-report" },
+    cucumberJsonReportFile <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber.json" },
+    cucumberJunitReportFile <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber.xml" },
 
     cucumberBefore := defaultBefore,
     cucumberAfter := defaultAfter
