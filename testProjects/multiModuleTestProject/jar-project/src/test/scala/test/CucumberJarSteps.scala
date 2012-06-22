@@ -1,6 +1,6 @@
 package test
 
-import cuke4duke.{EN, ScalaDsl}
+import cucumber.runtime.{EN, ScalaDsl}
 import org.scalatest.matchers.ShouldMatchers
 
 class CucumberJarSteps extends ScalaDsl with EN with ShouldMatchers {

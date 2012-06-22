@@ -8,14 +8,19 @@ import std.TaskStreams
  */
 trait CucumberIntegration {
 
-  protected def optionsForMode(mode: CucumberMode,
-                               htmlReportFile: File) = {
-    htmlReportFile.getParentFile.mkdirs()
-    mode match {
-      case Developer => List[String]("--format", "pretty")
-      case HtmlReport => List[String]("--format", "html", "--out", htmlReportFile.getPath)
-      case _ => List[String]("--format", "pretty")
-    }
+  protected def optionsForReporting(htmlReportDir: Option[File],
+                                    jsonReportFile: Option[File],
+                                    junitReportFile: Option[File]): List[String] = {
+    (Some("--format" :: "pretty" :: Nil) ::
+     (htmlReportDir map { dir => 
+       dir.mkdirs()
+       "--format" :: "html:%s".format(dir.getPath) :: Nil }) ::
+     (jsonReportFile map { file => 
+       file.getParentFile.mkdirs()
+       "--format" :: "json-pretty:%s".format(file.getPath) :: Nil }) ::
+     (junitReportFile map { file => 
+       file.getParentFile.mkdirs()
+       "--format" :: "junit:%s".format(file.getPath) :: Nil }) :: Nil).flatten.flatten
   }
 
   protected def testWithCucumber(args: Seq[String],

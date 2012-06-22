@@ -24,8 +24,11 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
   val cucumberFeaturesDir = SettingKey[File]("cucumber-features-directory")
   val cucumberStepsBasePackage = SettingKey[String]("cucumber-steps-base-package")
   val cucumberExtraOptions = SettingKey[Seq[String]]("cucumber-extra-options")
-  val cucumberMode = SettingKey[CucumberMode]("cucumber-mode")
-  val cucumberHtmlReportFile = SettingKey[File]("cucumber-html-report")
+
+  val cucumberHtmlReportDir = SettingKey[Option[File]]("cucumber-html-report")
+  val cucumberJsonReportFile = SettingKey[Option[File]]("cucumber-json-report")
+  val cucumberJunitReportFile = SettingKey[Option[File]]("cucumber-junit-report")
+
   val cucumberBefore = SettingKey[LifecycleCallback]("cucumber-before")
   val cucumberAfter = SettingKey[LifecycleCallback]("cucumber-after")
 
@@ -41,9 +44,10 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
 
   protected def cucumberOptionsTask: Initialize[Task[CucumberOptions]] =
     (cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
-     cucumberMode, cucumberHtmlReportFile, cucumberBefore, cucumberAfter) map {
-      (fd, bp, o, m, htmlRF, bf, af) => {
-        CucumberOptions(fd, bp, optionsForMode(m, htmlRF) ++ o, bf, af)
+     cucumberHtmlReportDir, cucumberJsonReportFile, cucumberJunitReportFile,
+     cucumberBefore, cucumberAfter) map {
+      (fd, bp, o, htmlRD, jsonRF, junitRF, bf, af) => {
+        CucumberOptions(fd, bp, optionsForReporting(htmlRD, jsonRF, junitRF) ++ o, bf, af)
       }
     }
 
@@ -62,15 +66,16 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
     cucumberTestSettings <<= cucumberSettingsTask,
     cucumberOptions <<= cucumberOptionsTask,
 
-    cucumberMode := Normal,
-
     cucumberMaxMemory := "256M",
     cucumberMaxPermGen := "64M",
 
     cucumberFeaturesDir <<= (baseDirectory) { _ / "src" / "test" / "features" },
     cucumberStepsBasePackage := "",
-    cucumberHtmlReportFile <<= (target) { _ / "cucumber-report" / "cucumber.html" },
     cucumberExtraOptions := List[String](),
+
+    cucumberHtmlReportDir := None,
+    cucumberJsonReportFile := None,
+    cucumberJunitReportFile := None,
 
     cucumberBefore := defaultBefore,
     cucumberAfter := defaultAfter

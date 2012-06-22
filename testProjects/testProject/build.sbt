@@ -13,3 +13,9 @@ libraryDependencies ++= Seq(
 seq(cucumberSettings : _*)
 
 cucumberStepsBasePackage := "test"
+
+cucumberHtmlReportDir <<= (target) { d => Some(d / "cucumber-report") }
+
+cucumberJsonReportFile <<= (target) { f => Some(f / "cucumber.json") }
+
+cucumberJunitReportFile <<= (target) { f => Some(f / "cucumber-junit.xml") }
