@@ -4,19 +4,21 @@ import templemore.xsbt.cucumber.CucumberPlugin
 
 object BuildSettings {
   val buildOrganization = "templemore"
-  val buildScalaVersion = "2.9.1"
-  val buildVersion      = "0.4.1"
+  val buildScalaVersion = "2.9.2"
+  val buildVersion      = "0.5.0"
 
   val buildSettings = Defaults.defaultSettings ++
                       Seq (organization := buildOrganization,
                            scalaVersion := buildScalaVersion,
                            version      := buildVersion) ++
-                      CucumberPlugin.cucumberSettings
+                      CucumberPlugin.cucumberSettings ++
+                      Seq (CucumberPlugin.cucumberHtmlReport := true,
+                           CucumberPlugin.cucumberPrettyReport := true)
 }
 
 object Dependencies {
 
-  val scalaTest = 	"org.scalatest" %% "scalatest" % "1.6.1" % "test"
+  val scalaTest = 	"org.scalatest" %% "scalatest" % "1.7.2" % "test"
 
   val testDeps = Seq(scalaTest)
 }

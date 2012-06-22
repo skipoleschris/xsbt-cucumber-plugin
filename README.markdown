@@ -1,17 +1,18 @@
 xsbt-cucumber-plugin
 ====================
 
-An [sbt 0.11.x](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features under [cuke4duke](http://github.com/aslakhellesoy/cuke4duke).
+An [sbt 0.11.x](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features.
 
-Provides the ability to run Cucumber via Cuke4Duke within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
+IMPORTANT: The current release is a major update that switches from running the ruby version of cucumber (using JRuby) to running cucumber-jvm. This provides a significant improvement in speed and reliability. It also significantly changes the configuration options for the plugin. If you are using an older version of this plugin, please read below and update your project configurations to match the new options.
 
-* Works with xsbt 0.11.0, 0.11.1 and 0.11.2
-* Works with Cucumber 1.0.0
-* Works with cuke4duke 0.4.4
-* Allows projects compiled and running against Scala 2.9.1
+Provides the ability to run Cucumber-jvm within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
+
+* Works with xsbt 0.11.3 (probably works with other 0.11.x versions, but I haven't tested this)
+* Works with cucumber-jvm (1.0.9 for scala 2.9 and 1.0.10 for scala 2.10)
+* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-M4
 
 ## Usage ##
-Install the plugin (see later). Be default features files go in a 'features' directory at the root of the project. Step definitions go in "src/test/scala'. Finally from the sbt console call the task:
+Install the plugin (see later). By default features files go in a 'src/test/features' directory. Step definitions go in 'src/test/scala'. Finally from the sbt console call the task:
 
     cucumber
 
@@ -29,7 +30,7 @@ would run features with a name matched to "User admin". Multiple arguments can b
 * arguments starting with anything else will be passed to cucumber using the --name flag
 
 ## Writing Features ##
-Features are written in text format and are placed in .feature files inside the 'features' directory. For more info on writing features please see the [Cucumber](http://cukes.info) website.
+Features are written in text format and are placed in .feature files inside the 'src/test/features' directory. For more info on writing features please see the [Cucumber](http://cukes.info) website.
 For example:
 
     Feature: Cucumber
@@ -45,10 +46,10 @@ For example:
 The location of the features can be changed by overriding a plugin setting (see below).
 
 ## Writing Step Defitions ##
-Step definitions can be written in Scala, using the cuke4duke Scala DSL. More information on this api can be obtained from the the [cuke4duke wiki page for scala](http://wiki.github.com/aslakhellesoy/cuke4duke/scala).
+Step definitions can be written in Scala, using the Scala DSL. More information on this api can be obtained from the the [Cucumber](http://cukes.info) website.
 For example:
 
-    import cuke4duke.{EN, ScalaDsl}
+    import cucumber.runtime.{EN, ScalaDsl}
     import org.scalatest.matchers.ShouldMatchers
 
     class CucumberSteps extends ScalaDsl with EN with ShouldMatchers {
@@ -75,7 +76,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.4.1")
+    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.5.0")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -101,46 +102,32 @@ To add the cucumber plugin settings to a full configuration (often a multi-modul
 
 The testProjects/multiModuleTestProject in the plugin source repository shows this setup in a multi-module project.
 
-## Gems ##
-All gems are automatically installed the first time that the cucumber plugin is run. These gems are installed to the default location {user.home}/.jruby/gems so that they are cached for all projects using the cucumber plugin. The location of the cache directory can be overridden in the settings.
-
-A task is provided to delete the cache directory contents:
-
-    cucumber-clean-gems
-
 ## Customisation ##
 The plugin supports a number of customisations and settings. The following settings can be modified to change the behaviour of the plugin:
 
-### Mode ###
-* cucumberMode = The mode to run cucumber in. Defaults to the value templemore.xsbt.cucumber.Normal
-
-The four supported modes are:
-
-* templemore.xsbt.cucumber.Normal - Runs cucumber and outputs results to the console
-* templemore.xsbt.cucumber.Developer - Runs cucumber and outputs results, snippets and source to the console
-* templemore.xsbt.cucumber.HtmlReport - Runs cucumber and outputs an html report of the results
-* templemore.xsbt.cucumber.PdfReport - Runs cucumber and outputs a pdf report of the results
-
-### General Settings ###
-* cucumberJRubyHome - The location for the JRuby home. Defaults to a java.io.File of {user.home}/.jruby
-* cucumberGemDir - The location of the Gem cache directory. Defaults to a java.io.File of {cucumberJRubyHome}/gems
-* cucumberMaxMemory - The maximum JVM memory to allocate to the JRuby process. Defaults to the string "256M"
-* cucumberMaxPermGen - The maximum PermGen space for the JRuby process. Defaults to the string "64M"
-
-### Gem Settings ###
-* cucumberVersion - The version of Cucumber to use. Defaults to the string "1.0.0"
-* cucumberCuke4DukeVersion - The version of Cuke4Duke to use. Defaults to the string "0.4.4"
-* cucumberPrawnVersion - The version of the Prawn PDF generator to use. Defaults to the string "0.8.4"
-* cucumberGemUrl - The URL for downloading Gems. Default to the string "http://rubygems.org/"
-* cucumberForceGemReload - Whether to force reloading of all gems, even if they exist in the cache. Defaults to false
-
 ### Cucumber Settings ###
-* cucumberFeaturesDir - The location of the cucumber features directory within the projects. Defaults to a java.io.File of ./features
-* cucumberOptions - Custom options to pass to the cucumber command. Defaults to an empty List[String]
+* cucumberFeaturesDir - The location of the cucumber features directory within the projects. Defaults to a java.io.File of ./src/test/features
+* cucumberStepsBasePackage - The base package from which to search for files containing Steps. Defaults to an empty String (search all packages)
+* cucumberExtraOptions - Additional commandline options to pass to the cucumber command. Defaults to an empty List[String]
+
+Note: The cucumberStepsBasePackage should be set in configurations to avoid scanning the entire classpath for files containing Steps
 
 ### Output Settings ###
-* cucumberHtmlReportFile - The location of the html report file. Defaults fo a java.io.File of ./target/cucumber-report/cucumber.html
-* cucumberPdfReportFile - The location of the pdf report file. Defaults fo a java.io.File of ./target/cucumber-report/cucumber.pdf
+* cucumberPrettyReport - Outputs a pretty printed text file of the executed features instead of writing them to the console. The console display is default to just displaying progress dots. This solves the problem of interleaving of parallel test output when running in a multi-module project. Defaults to the Boolean value false
+* cucumberHtmlReport - Outputs an html report of the executed features to a report directory. Defaults to the Boolean value false
+* cucumberJunitReport - Outputs a Junit format XML report file of the executed features. Defaults to the Boolean value false
+* cucumberJsonReport - Outputs a JSON format report file of the executed features. Defaults to the Boolean value false
+
+If none of the above are set to true then the default output is pretty printed features to the console. It is possible to support multiple outputs in a single run by setting more than one of the above settings to true. For multi-module projects it is recommended to set cucumberPrettyReport to true so that you don't end up with interleaved console output caused by cucumber being run concurrently for each project.
+
+* cucumberPrettyReportFile - The location of the pretty printed text report file. Defaults to a java.io.File of ./target/scala-{scalaVersion}/cucumber.txt
+* cucumberHtmlReportDir - The directory for the html report. Defaults to a java.io.File of ./target/scala-{scalaVersion}/cucumber/
+* cucumberJunitReportFile - The location of the Junit XML report file. Defaults fo a java.io.File of ./target/scala-{scalaVersion}/cucumber.xml
+* cucumberJsonReportFile - The location of the JSON format report file. Defaults fo a java.io.File of ./target/scala-{scalaVersion}/cucumber.json
+
+### JVM Settings ###
+* cucumberMaxMemory - The maximum JVM memory to allocate to the JRuby process. Defaults to the string "256M"
+* cucumberMaxPermGen - The maximum PermGen space for the JRuby process. Defaults to the string "64M"
 
 ### Lifecycle Settings ###
 * cucumberBefore - A function of type () => Unit that will be run BEFORE cucumber is executed. Defaults to a no-op function
@@ -148,13 +135,13 @@ The four supported modes are:
 
 ## Roadmap ##
 
-This plugin will continue to track releases of both SBT (0.10 and onwards) and Cucumber.
+This plugin will continue to track releases of both SBT (0.10 and onwards) and Cucumber-jvm.
 Requests for features can be posted to the issues list or emailed to the author.
-
-Current plan is to upgrade to the next major version of SBT and then to switch to cucumber-jvm as soon as there is a stable release.
 
 ## Release History ##
 
+### 0.5.0 ###
+Moved from ruby implementation of Cucumber to Cucumber-jvm. This changes many of the plugin settings and options. In particular, output options are significantly improved.
 
 ### 0.4.1 ###
 Updated to build versions for xsbt 0.11.0, 0.11.1 and 0.11.2
