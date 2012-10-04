@@ -1,15 +1,16 @@
 xsbt-cucumber-plugin
 ====================
 
-An [sbt 0.11.x](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features.
+An [sbt 0.12.x](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features.
 
-IMPORTANT: The current release is a major update that switches from running the ruby version of cucumber (using JRuby) to running cucumber-jvm. This provides a significant improvement in speed and reliability. It also significantly changes the configuration options for the plugin. If you are using an older version of this plugin, please read below and update your project configurations to match the new options.
+IMPORTANT: Release 0.5.0 onwards are a major update that switches from running the ruby version of cucumber (using JRuby) to running cucumber-jvm. This provides a significant improvement in speed and reliability. It also significantly changes the configuration options for the plugin. If you are using a version of this plugin before 0.5.0, please read below and update your project configurations to match the new options.
 
 Provides the ability to run Cucumber-jvm within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
 
-* Works with xsbt 0.11.3 (probably works with other 0.11.x versions, but I haven't tested this)
-* Works with cucumber-jvm (1.0.9 for scala 2.9 and 1.0.10 for scala 2.10)
-* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-M4
+* Works with xsbt 0.12.0
+* Works with cucumber-jvm (version 1.0.9 for Scala 2.9.x and version 1.0.14 for Scala 2.10.0-M6)
+* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-M6 
+* NOTE: Currently doesn't work with Scala 2.10.0-M7 as this isn't supported by the latest cucumber-jvm version
 
 ## Usage ##
 Install the plugin (see later). By default features files go in a 'src/test/features' directory. Step definitions go in 'src/test/scala'. Finally from the sbt console call the task:
@@ -76,7 +77,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.5.0")
+    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.6.0")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -139,6 +140,9 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.6.0 ###
+Updated to work the SBT 0.12.0, Scala 2.9.2 and the latest Cucumber-jvm 1.0.14 versions.
 
 ### 0.5.0 ###
 Moved from ruby implementation of Cucumber to Cucumber-jvm. This changes many of the plugin settings and options. In particular, output options are significantly improved.

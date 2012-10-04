@@ -10,7 +10,7 @@ import Project.Initialize
 object CucumberPlugin extends Plugin with CucumberIntegration {
 
   private val CucumberVersionForScala2_9 = "1.0.9"
-  private val CucumberVersionForScala2_10 = "1.0.10"
+  private val CucumberVersionForScala2_10 = "1.0.14"
 
   type LifecycleCallback = () => Unit
 
