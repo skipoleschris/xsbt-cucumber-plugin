@@ -1,6 +1,6 @@
 name := "test-project"
 
-version := "0.6.0"
+version := "0.6.1"
 
 organization := "templemore"
 
@@ -19,3 +19,8 @@ cucumberHtmlReport := true
 cucumberJunitReport := true 
 
 cucumberJsonReport := true
+
+cucumberSystemProperties := Map("testing" -> "true", "demo" -> "yes")
+
+cucumberJVMOptions := List("-showversion", "-esa")
+

@@ -19,5 +19,7 @@ class CucumberJarStepDefinitions extends ScalaDsl with EN with ShouldMatchers {
   Then("""^Cucumber is executed against the features and step definitions$""") { () =>
     givenCalled should be (true)
     whenCalled should be (true)
+    System.getProperty("testing") should be ("true")
+    System.getProperty("demo") should be ("yes")
   }
 }

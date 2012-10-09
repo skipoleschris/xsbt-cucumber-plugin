@@ -9,14 +9,17 @@ import sbt.OutputStrategy
  */
 case class Cucumber(classpath: List[File],
                     outputStrategy: OutputStrategy,
+                    systemProperties: Map[String, String],
+                    jvmOptions: List[String],
                     overrideMaxMemory: Option[String] = None,
                     overrideMaxPermGen: Option[String] = None) {
 
   private val maxMemory = overrideMaxMemory.getOrElse("256M")
   private val maxPermGen = overrideMaxPermGen.getOrElse("64M")
 
-  private val jvmArgs = "-classpath" :: makeClasspath(classpath) ::
-                        ("-Xmx%s" format maxMemory) :: ("-XX:MaxPermSize=%s" format maxPermGen) :: Nil
+  private val jvmArgs = ("-classpath" :: makeClasspath ::
+                        ("-Xmx%s" format maxMemory) :: ("-XX:MaxPermSize=%s" format maxPermGen) :: Nil) ++
+                        makeSystemProperties ++ jvmOptions
 
   def cuke(featuresDir: File, basePackage: String, options: List[String] = List(),
            tags: List[String] = List(), names: List[String] = List()): Int = {
@@ -30,6 +33,7 @@ case class Cucumber(classpath: List[File],
     Fork.java(None, args, None, Map.empty[String, String], outputStrategy)
   }
 
-  protected def makeClasspath(pathElements: List[File]) = pathElements.map(_.getPath).mkString(File.pathSeparator)
+  protected def makeClasspath = classpath.map(_.getPath).mkString(File.pathSeparator)
   protected def makeOptionsList(options: List[String], flag: String) = options flatMap(List(flag, _))
+  protected def makeSystemProperties = systemProperties.toList map (entry => "-D%s=%s".format(entry._1, entry._2))
 }

@@ -8,6 +8,8 @@ import sbt.OutputStrategy
  */
 case class CucumberSettings(maxMemory: String,
                             maxPermGen: String,
+                            systemProperties: Map[String, String],
+                            jvmOptions: List[String],
                             classpath: List[File],
                             outputStrategy: OutputStrategy)
 

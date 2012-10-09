@@ -77,7 +77,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.6.0")
+    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.6.1")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -127,8 +127,10 @@ If none of the above are set to true then the default output is pretty printed f
 * cucumberJsonReportFile - The location of the JSON format report file. Defaults fo a java.io.File of ./target/scala-{scalaVersion}/cucumber.json
 
 ### JVM Settings ###
-* cucumberMaxMemory - The maximum JVM memory to allocate to the JRuby process. Defaults to the string "256M"
-* cucumberMaxPermGen - The maximum PermGen space for the JRuby process. Defaults to the string "64M"
+* cucumberMaxMemory - The maximum JVM memory to allocate to the JVM process. Defaults to the string "256M"
+* cucumberMaxPermGen - The maximum PermGen space for the JVM process. Defaults to the string "64M"
+* cucumberSystemProperties - System properties to be passed to the JVM process using the -D flag. Defaults to and empty Map[String, String]
+* cucumberJVMOptions - Additional options to be passed to the JVM that runs cucumber. Defaults to an empty List[String]
 
 ### Lifecycle Settings ###
 * cucumberBefore - A function of type () => Unit that will be run BEFORE cucumber is executed. Defaults to a no-op function
@@ -140,6 +142,10 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.6.1 ###
+Update to allow system properties and other JVM arguments to be passed to the JVM that runs cucumber.
+Corrections to documentation.
 
 ### 0.6.0 ###
 Updated to work the SBT 0.12.0, Scala 2.9.2 and the latest Cucumber-jvm 1.0.14 versions.

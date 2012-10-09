@@ -21,6 +21,8 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
 
   val cucumberMaxMemory = SettingKey[String]("cucumber-max-memory")
   val cucumberMaxPermGen = SettingKey[String]("cucumber-max-perm-gen")
+  val cucumberSystemProperties = SettingKey[Map[String, String]]("cucumber-system-properties")
+  val cucumberJVMOptions = SettingKey[List[String]]("cucumber-jvm-options")
 
   val cucumberFeaturesDir = SettingKey[File]("cucumber-features-directory")
   val cucumberStepsBasePackage = SettingKey[String]("cucumber-steps-base-package")
@@ -43,9 +45,9 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
     (argTask, cucumberTestSettings, cucumberOptions, cucumberOutput, streams) map(testWithCucumber)
 
   protected def cucumberSettingsTask: Initialize[Task[CucumberSettings]] =
-    (cucumberMaxMemory, cucumberMaxPermGen, fullClasspath in Test, streams) map {
-      (mm, mpg, cp, s) => {
-        CucumberSettings(mm, mpg, cp.toList.map(_.data), LoggedOutput(s.log))
+    (cucumberMaxMemory, cucumberMaxPermGen, cucumberSystemProperties, cucumberJVMOptions, fullClasspath in Test, streams) map {
+      (mm, mpg, sp, jvmopt, cp, s) => {
+        CucumberSettings(mm, mpg, sp, jvmopt, cp.toList.map(_.data), LoggedOutput(s.log))
       }
     }
 
@@ -83,10 +85,12 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
 
     cucumberMaxMemory := "256M",
     cucumberMaxPermGen := "64M",
+    cucumberSystemProperties := Map.empty[String, String],
+    cucumberJVMOptions := Nil,
 
     cucumberFeaturesDir <<= (baseDirectory) { _ / "src" / "test" / "features" },
     cucumberStepsBasePackage := "",
-    cucumberExtraOptions := List[String](),
+    cucumberExtraOptions := List.empty[String],
 
     cucumberPrettyReport := false,
     cucumberHtmlReport := false,
