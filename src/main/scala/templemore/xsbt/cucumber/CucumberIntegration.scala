@@ -41,7 +41,7 @@ trait CucumberIntegration {
 
     log.info("Running cucumber...")
     cucumberOptions.beforeFunc()
-    val cucumber = Cucumber(cucumberSettings.classpath, cucumberSettings.outputStrategy,
+    val cucumber = Cucumber(cucumberSettings.classpath, cucumberOptions.mainClass, cucumberSettings.outputStrategy,
                             cucumberSettings.systemProperties, cucumberSettings.jvmOptions,
                             Some(cucumberSettings.maxMemory), Some(cucumberSettings.maxPermGen))
     val result = cucumber.cuke(cucumberOptions.featuresDir, cucumberOptions.basePackage,

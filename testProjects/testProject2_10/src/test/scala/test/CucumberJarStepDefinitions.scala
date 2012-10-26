@@ -1,6 +1,6 @@
 package test
 
-import cucumber.runtime.{EN, ScalaDsl}
+import cucumber.api.scala.{ScalaDsl, EN}
 import org.scalatest.matchers.ShouldMatchers
 
 class CucumberJarStepDefinitions extends ScalaDsl with EN with ShouldMatchers {

@@ -8,9 +8,8 @@ IMPORTANT: Release 0.5.0 onwards are a major update that switches from running t
 Provides the ability to run Cucumber-jvm within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
 
 * Works with xsbt 0.12.0
-* Works with cucumber-jvm (version 1.0.9 for Scala 2.9.x and version 1.0.14 for Scala 2.10.0-M6)
-* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-M6 
-* NOTE: Currently doesn't work with Scala 2.10.0-M7 as this isn't supported by the latest cucumber-jvm version
+* Works with cucumber-jvm (version 1.0.9 for Scala 2.9.x and version 1.1.1 for Scala 2.10.0-RC1)
+* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-RC1 
 
 ## Usage ##
 Install the plugin (see later). By default features files go in a 'src/test/features' directory. Step definitions go in 'src/test/scala'. Finally from the sbt console call the task:
@@ -72,12 +71,18 @@ For example:
       }
     }
 
+NOTE: When running Scala 2.10, change the import to:
+
+    import cucumber.api.scala.{ScalaDsl, EN}
+
+This is required as the Cucumber package structure changed between the 1.0.x and 1.1.x releases
+
 ## Project Setup ##
 To install the cucumber plugin, add entries to the build plugins file (project/plugins/build.sbt) as follows:
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.6.1")
+    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.6.2")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -142,6 +147,9 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.6.2 ###
+Upgrade to cucumber-jvm version 1.1.1 to allow compatibility with Scala 2.10.0-RC1 release.
 
 ### 0.6.1 ###
 Update to allow system properties and other JVM arguments to be passed to the JVM that runs cucumber.

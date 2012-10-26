@@ -8,6 +8,7 @@ import sbt.OutputStrategy
  * @author Chris Turner
  */
 case class Cucumber(classpath: List[File],
+                    mainClass: String,
                     outputStrategy: OutputStrategy,
                     systemProperties: Map[String, String],
                     jvmOptions: List[String],
@@ -28,7 +29,7 @@ case class Cucumber(classpath: List[File],
                          options ++ makeOptionsList(tags, "--tags") ++ makeOptionsList(names, "--name") ++
                          (featuresDir.getPath :: Nil)
 
-    val args = jvmArgs ++ ("cucumber.cli.Main" :: cucumberParams)
+    val args = jvmArgs ++ (mainClass :: cucumberParams)
     outputStrategy.asInstanceOf[LoggedOutput].logger.debug(args mkString " ")
     Fork.java(None, args, None, Map.empty[String, String], outputStrategy)
   }

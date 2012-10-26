@@ -10,7 +10,7 @@ import Project.Initialize
 object CucumberPlugin extends Plugin with CucumberIntegration {
 
   private val CucumberVersionForScala2_9 = "1.0.9"
-  private val CucumberVersionForScala2_10 = "1.0.14"
+  private val CucumberVersionForScala2_10 = "1.1.1"
 
   type LifecycleCallback = () => Unit
 
@@ -24,6 +24,7 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
   val cucumberSystemProperties = SettingKey[Map[String, String]]("cucumber-system-properties")
   val cucumberJVMOptions = SettingKey[List[String]]("cucumber-jvm-options")
 
+  val cucumberMainClass = SettingKey[String]("cucumber-main-class")
   val cucumberFeaturesDir = SettingKey[File]("cucumber-features-directory")
   val cucumberStepsBasePackage = SettingKey[String]("cucumber-steps-base-package")
   val cucumberExtraOptions = SettingKey[List[String]]("cucumber-extra-options")
@@ -52,10 +53,10 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
     }
 
   protected def cucumberOptionsTask: Initialize[Task[CucumberOptions]] =
-    (cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
+    (cucumberMainClass, cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
      cucumberBefore, cucumberAfter) map {
-      (fd, bp, o, bf, af) => {
-        CucumberOptions(fd, bp, o, bf, af)
+      (mc, fd, bp, o, bf, af) => {
+        CucumberOptions(mc, fd, bp, o, bf, af)
       }
     }
 
@@ -73,6 +74,9 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
   private def cucumberVersion(scalaVersion: String) = 
     if ( scalaVersion.startsWith("2.10") ) CucumberVersionForScala2_10 else CucumberVersionForScala2_9
 
+  private def cucumberMain(scalaVersion: String) = 
+    if ( scalaVersion.startsWith("2.10") ) "cucumber.api.cli.Main" else "cucumber.cli.Main"
+
   val cucumberSettings = Seq(
     libraryDependencies <+= scalaVersion { sv =>
       "info.cukes" % "cucumber-scala" % cucumberVersion(sv) % "test"      
@@ -88,6 +92,7 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
     cucumberSystemProperties := Map.empty[String, String],
     cucumberJVMOptions := Nil,
 
+    cucumberMainClass <<= (scalaVersion) { sv => cucumberMain(sv) },
     cucumberFeaturesDir <<= (baseDirectory) { _ / "src" / "test" / "features" },
     cucumberStepsBasePackage := "",
     cucumberExtraOptions := List.empty[String],
