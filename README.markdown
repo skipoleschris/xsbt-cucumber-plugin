@@ -82,7 +82,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.6.2")
+    addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.7.0")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -147,6 +147,10 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.7.0 ###
+
+TODO
 
 ### 0.6.2 ###
 Upgrade to cucumber-jvm version 1.1.1 to allow compatibility with Scala 2.10.0-RC1 release.

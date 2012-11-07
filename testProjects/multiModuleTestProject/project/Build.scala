@@ -5,7 +5,7 @@ import templemore.xsbt.cucumber.CucumberPlugin
 object BuildSettings {
   val buildOrganization = "templemore"
   val buildScalaVersion = "2.9.2"
-  val buildVersion      = "0.6.2"
+  val buildVersion      = "0.7.0"
 
   val buildSettings = Defaults.defaultSettings ++
                       Seq (organization := buildOrganization,

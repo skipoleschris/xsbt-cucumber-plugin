@@ -1,12 +1,14 @@
-package templemore.xsbt.cucumber
+package templemore.sbt.cucumber
 
 import java.io.File
 
 /**
+ * Defines the output options for running cucumber.
+ *
  * @author Chris Turner
  */
-case class CucumberOutput(prettyReport: Boolean, htmlReport: Boolean, junitReport: Boolean, jsonReport: Boolean,
-                          prettyReportFile: File, htmlReportDir: File, junitReportFile: File, jsonReportFile: File) {
+case class Output(prettyReport: Boolean, htmlReport: Boolean, junitReport: Boolean, jsonReport: Boolean,
+                  prettyReportFile: File, htmlReportDir: File, junitReportFile: File, jsonReportFile: File) {
 
   def options: List[String] = {
     (if (prettyReport) {

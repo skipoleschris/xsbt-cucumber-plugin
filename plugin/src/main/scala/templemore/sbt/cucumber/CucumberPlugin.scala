@@ -1,23 +1,25 @@
-package templemore.xsbt.cucumber
+package templemore.sbt.cucumber
 
 import sbt._
 import Keys._
 import Project.Initialize
+import templemore.sbt.util._
 
 /**
  * @author Chris Turner
  */
-object CucumberPlugin extends Plugin with CucumberIntegration {
+object CucumberPlugin extends Plugin with Integration {
 
+  private val projectVersion = "0.7.0"
   private val CucumberVersionForScala2_9 = "1.0.9"
   private val CucumberVersionForScala2_10 = "1.1.1"
 
   type LifecycleCallback = () => Unit
 
   val cucumber = InputKey[Int]("cucumber")
-  val cucumberTestSettings = TaskKey[CucumberSettings]("cucumber-settings")
-  val cucumberOptions = TaskKey[CucumberOptions]("cucumber-options")
-  val cucumberOutput = TaskKey[CucumberOutput]("cucumber-output")
+  val cucumberTestSettings = TaskKey[JvmSettings]("cucumber-settings")
+  val cucumberOptions = TaskKey[Options]("cucumber-options")
+  val cucumberOutput = TaskKey[Output]("cucumber-output")
 
   val cucumberMaxMemory = SettingKey[String]("cucumber-max-memory")
   val cucumberMaxPermGen = SettingKey[String]("cucumber-max-perm-gen")
@@ -43,28 +45,22 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
   val cucumberAfter = SettingKey[LifecycleCallback]("cucumber-after")
 
   protected def cucumberTask(argTask: TaskKey[Seq[String]]) =
-    (argTask, cucumberTestSettings, cucumberOptions, cucumberOutput, streams) map(testWithCucumber)
+    (argTask, cucumberTestSettings, cucumberOptions, cucumberOutput, streams) map(cuke)
 
-  protected def cucumberSettingsTask: Initialize[Task[CucumberSettings]] =
-    (cucumberMaxMemory, cucumberMaxPermGen, cucumberSystemProperties, cucumberJVMOptions, fullClasspath in Test, streams) map {
-      (mm, mpg, sp, jvmopt, cp, s) => {
-        CucumberSettings(mm, mpg, sp, jvmopt, cp.toList.map(_.data), LoggedOutput(s.log))
-      }
+  protected def cucumberSettingsTask: Initialize[Task[JvmSettings]] =
+    (fullClasspath in Test, cucumberMainClass, streams, cucumberSystemProperties, cucumberJVMOptions, cucumberMaxMemory, cucumberMaxPermGen) map {
+      (cp, mc, s, sp, jvmopt, mm, mpg) => JvmSettings(cp.toList.map(_.data), mc, LoggedOutput(s.log), sp, jvmopt, Some(mm), Some(mpg))
     }
 
-  protected def cucumberOptionsTask: Initialize[Task[CucumberOptions]] =
-    (cucumberMainClass, cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
-     cucumberBefore, cucumberAfter) map {
-      (mc, fd, bp, o, bf, af) => {
-        CucumberOptions(mc, fd, bp, o, bf, af)
-      }
-    }
+  protected def cucumberOptionsTask: Initialize[Task[Options]] =
+    (cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
+     cucumberBefore, cucumberAfter) map ((fd, bp, o, bf, af) => Options(fd, bp, o, bf, af))
 
-  protected def cucumberOutputTask: Initialize[Task[CucumberOutput]] =
+  protected def cucumberOutputTask: Initialize[Task[Output]] =
     (cucumberPrettyReport, cucumberHtmlReport, cucumberJunitReport, cucumberJsonReport,
      cucumberPrettyReportFile, cucumberHtmlReportDir, cucumberJunitReportFile, cucumberJsonReportFile) map {
       (pR, hR, juR, jsR, pRF, hRD, juRF, jsRF) => {
-        CucumberOutput(pR, hR, juR, jsR, pRF, hRD, juRF, jsRF)
+        Output(pR, hR, juR, jsR, pRF, hRD, juRF, jsRF)
       }
     }
 
@@ -77,7 +73,7 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
   private def cucumberMain(scalaVersion: String) = 
     if ( scalaVersion.startsWith("2.10") ) "cucumber.api.cli.Main" else "cucumber.cli.Main"
 
-  val cucumberSettings = Seq(
+  val cucumberSettings: Seq[Setting[_]] = Seq(
     libraryDependencies <+= scalaVersion { sv =>
       "info.cukes" % "cucumber-scala" % cucumberVersion(sv) % "test"      
     },
@@ -110,4 +106,11 @@ object CucumberPlugin extends Plugin with CucumberIntegration {
     cucumberBefore := defaultBefore,
     cucumberAfter := defaultAfter
   )
+
+  val cucumberSettingsWithTestPhaseIntegration = cucumberSettings ++ Seq(
+    libraryDependencies ++= Seq(
+      "templemore" %% "sbt-cucumber-integration" % projectVersion % "test"
+    ),
+    testFrameworks += new TestFramework("templemore.sbt.cucumber.CucumberFramework")
+  ) 
 }

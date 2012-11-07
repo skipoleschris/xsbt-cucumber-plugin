@@ -1,3 +1,3 @@
 resolvers += Resolver.file("Local Repo", file((Path.userHome / ".m2" / "repository").toString))
 
-addSbtPlugin("templemore" % "xsbt-cucumber-plugin" % "0.6.2")
+addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.0")
