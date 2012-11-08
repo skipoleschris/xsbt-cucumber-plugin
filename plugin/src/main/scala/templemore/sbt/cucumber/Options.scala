@@ -7,11 +7,11 @@ import java.io.File
  *
  * @author Chris Turner
  */
-case class Options(featuresDir: File,
+case class Options(featuresLocation: String,
                    basePackage: String,
                    extraOptions: List[String],
                    beforeFunc: () => Unit,
                    afterFunc: () => Unit) {
 
-  def featuresPresent = featuresDir.exists
+  def featuresPresent = featuresLocation.startsWith("classpath:") || (new File(featuresLocation).exists)
 }

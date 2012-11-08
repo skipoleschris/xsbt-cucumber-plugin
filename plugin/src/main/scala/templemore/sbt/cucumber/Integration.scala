@@ -62,7 +62,7 @@ trait Integration {
                          output.options ++
                          makeOptionsList(tags, "--tags") ++ 
                          makeOptionsList(names, "--name") ++
-                         (options.featuresDir.getPath :: Nil)
+                         (options.featuresLocation :: Nil)
     JvmLauncher(jvmSettings).launch(cucumberParams)
   }
 }

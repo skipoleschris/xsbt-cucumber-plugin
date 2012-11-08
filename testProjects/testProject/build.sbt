@@ -10,6 +10,7 @@ libraryDependencies ++= Seq(
 	"org.scalatest" %% "scalatest" % "1.7.2" % "test"
 )
 
+
 seq(cucumberSettings : _*)
 
 cucumberStepsBasePackage := "test"

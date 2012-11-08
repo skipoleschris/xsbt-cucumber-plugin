@@ -27,7 +27,7 @@ object CucumberPlugin extends Plugin with Integration {
   val cucumberJVMOptions = SettingKey[List[String]]("cucumber-jvm-options")
 
   val cucumberMainClass = SettingKey[String]("cucumber-main-class")
-  val cucumberFeaturesDir = SettingKey[File]("cucumber-features-directory")
+  val cucumberFeaturesLocation = SettingKey[String]("cucumber-features-location")
   val cucumberStepsBasePackage = SettingKey[String]("cucumber-steps-base-package")
   val cucumberExtraOptions = SettingKey[List[String]]("cucumber-extra-options")
 
@@ -53,8 +53,8 @@ object CucumberPlugin extends Plugin with Integration {
     }
 
   protected def cucumberOptionsTask: Initialize[Task[Options]] =
-    (cucumberFeaturesDir, cucumberStepsBasePackage, cucumberExtraOptions,
-     cucumberBefore, cucumberAfter) map ((fd, bp, o, bf, af) => Options(fd, bp, o, bf, af))
+    (cucumberFeaturesLocation, cucumberStepsBasePackage, cucumberExtraOptions,
+     cucumberBefore, cucumberAfter) map ((fl, bp, o, bf, af) => Options(fl, bp, o, bf, af))
 
   protected def cucumberOutputTask: Initialize[Task[Output]] =
     (cucumberPrettyReport, cucumberHtmlReport, cucumberJunitReport, cucumberJsonReport,
@@ -89,7 +89,8 @@ object CucumberPlugin extends Plugin with Integration {
     cucumberJVMOptions := Nil,
 
     cucumberMainClass <<= (scalaVersion) { sv => cucumberMain(sv) },
-    cucumberFeaturesDir <<= (baseDirectory) { _ / "src" / "test" / "features" },
+    cucumberFeaturesLocation := "classpath:",
+    // Replaced with cucumber on the classpath: cucumberFeaturesLocation <<= (baseDirectory) { (_ / "src" / "test" / "features").getPath },
     cucumberStepsBasePackage := "",
     cucumberExtraOptions := List.empty[String],
 
