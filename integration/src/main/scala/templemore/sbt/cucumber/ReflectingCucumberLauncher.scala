@@ -20,7 +20,9 @@ class ReflectingCucumberLauncher(debug: (String) => Unit, error: (String) => Uni
   private def runCucumber(runtime: AnyRef) = try { 
     val runtimeClass = runtime.getClass
     runtimeClass.getMethod("writeStepdefsJson").invoke(runtime)
+println("*** about to call run()...")
     runtimeClass.getMethod("run").invoke(runtime)
+println("*** run() complete, getting exit status...")
     runtimeClass.getMethod("exitStatus").invoke(runtime)
   } catch {
     case e: InvocationTargetException => {

@@ -21,3 +21,5 @@ class CucumberJarSteps extends ScalaDsl with EN with ShouldMatchers {
     whenCalled should be (true)
   }
 }
+
+class CucumberSuite extends templemore.sbt.cucumber.RunCucumber

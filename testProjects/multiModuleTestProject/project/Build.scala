@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import templemore.xsbt.cucumber.CucumberPlugin
+import templemore.sbt.cucumber.CucumberPlugin
 
 object BuildSettings {
   val buildOrganization = "templemore"
@@ -10,17 +10,23 @@ object BuildSettings {
   val buildSettings = Defaults.defaultSettings ++
                       Seq (organization := buildOrganization,
                            scalaVersion := buildScalaVersion,
-                           version      := buildVersion) ++
-                      CucumberPlugin.cucumberSettings ++
-                      Seq (CucumberPlugin.cucumberHtmlReport := true,
-                           CucumberPlugin.cucumberPrettyReport := true)
+                           version      := buildVersion)
+
+  // NOTE: If not worried about integration with the 'test' task then use:
+  //   CucumberPlugin.cucumberSettings instead of CucumberPlugin.cucumberSettingsWithTestPhaseIntegration
+  val cucumberSettings = CucumberPlugin.cucumberSettingsWithTestPhaseIntegration ++
+                         Seq(CucumberPlugin.cucumberHtmlReport := true,
+                             CucumberPlugin.cucumberPrettyReport := true)
 }
 
 object Dependencies {
 
-  val scalaTest = 	"org.scalatest" %% "scalatest" % "1.7.2" % "test"
+  val scalaTest = "org.scalatest" %% "scalatest" % "1.7.2" % "test"
 
-  val testDeps = Seq(scalaTest)
+  // NOTE: This dependency is only required when using 'test' task integration
+  val testIntegration = "templemore" %% "sbt-cucumber-integration" % "0.7.0" % "test"
+ 
+  val testDeps = Seq(scalaTest, testIntegration)
 }
 
 object TestProjectBuild extends Build {
@@ -32,8 +38,8 @@ object TestProjectBuild extends Build {
 
 
   lazy val jarProject = Project ("jar-project", file ("jar-project"),
-           settings = buildSettings ++ Seq (libraryDependencies ++= testDeps))
+           settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies ++= testDeps))
 
   lazy val warProject = Project ("war-project", file ("war-project"),
-           settings = buildSettings ++ Seq (libraryDependencies ++= testDeps)) dependsOn (jarProject)
+           settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies ++= testDeps)) dependsOn (jarProject)
 }
