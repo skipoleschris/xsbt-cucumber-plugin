@@ -14,7 +14,17 @@ object Settings {
 }
 
 object Dependencies {
-  val testInterface = "org.scala-tools.testing" % "test-interface" % "0.5"
+
+  private val CucumberVersionForScala2_9 = "1.0.9"
+  private val CucumberVersionForScala2_10 = "1.1.1"
+
+  def cucumberScala(scalaVersion: String) = {
+    def cucumberVersion = if ( scalaVersion.startsWith("2.10") ) CucumberVersionForScala2_10 else CucumberVersionForScala2_9
+    "info.cukes" % "cucumber-scala" % cucumberVersion % "compile"      
+  }
+  val cucumber = "info.cukes" % "cucumber-scala" % "1.0.9" % "compile"
+
+  val testInterface = "org.scala-tools.testing" % "test-interface" % "0.5" % "compile"
 }
 
 object Build extends Build {
@@ -30,6 +40,8 @@ object Build extends Build {
 
   lazy val integrationProject = Project ("sbt-cucumber-integration", file ("integration"),
     settings = buildSettings ++ 
-               Seq(crossScalaVersions := Seq("2.9.2", "2.10.0-RC1"),
-                   libraryDependencies ++= Seq(testInterface)))
+               Seq(crossScalaVersions := Seq("2.9.2", "2.10.0-RC1", "2.10.0-RC2"),
+                   libraryDependencies <+= scalaVersion { sv => cucumberScala(sv) },
+                   libraryDependencies += testInterface))
 }
+

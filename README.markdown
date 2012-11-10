@@ -9,8 +9,7 @@ It adds the ability to run cucumber as a standalone SBT task but also as a test 
 ### EXPERIMENTAL RELEASE ###
 This is currently an experimental release of the ability to run cucumber as a standard SBT test framework. The basic mechanisms are in place, but currently the following are broken / do not work:
 
-* When running the 'test' target, cucumber runs but then seems to lock up rather than return control back to SBT [Major]
-* Currently does not work with Scala 2.10.0-RC1 (I've only been testing against 2.9.2 projects and need to cross-build the integration project to allow it to work)
+* Currently MAY not work with Scala 2.10.0-RC1 (I've only been testing against 2.9.2 projects and need to cross-build the integration project to allow it to work)
 * There is currently no support for 'test-only' and no way to just run features with specific names or tags
 * When running in a multi-project setup, the cucumbers for each project are run in parallel and the output is interleaved and thus unreadable.
 
@@ -119,15 +118,9 @@ To add the cucumber plugin settings to a basic project, just add the following t
 The testProjects/testProject in the plugin source repository shows this configuration.
 
 #### Running as a test framework ####
-If you wish to support cucumber running as a test framework (via the test task) then the following settings should be placed in the build.sbt file instead:
-
-    libraryDependencies ++= Seq(
-      "templemore" %% "sbt-cucumber-integration" % "0.7.0" % "test"
-    )
+If you wish to support cucumber running as a test framework (via the test task) then use this alternative settings group instead:
 
     seq(cucumberSettingsWithTestPhaseIntegration : _*)
-
-Note that cucumberSettingsWithTestPhaseIntegration replaces cucumberSettings in this case. The testProjects/testIntegrationProject in the plugin source repository showns this configuration.
 
 ### Full Configuration ###
 To add the cucumber plugin settings to a full configuration (often a multi-module) project, the best way is to implement a project/Build.scala file:
@@ -149,12 +142,9 @@ The testProjects/multiModuleTestProject in the plugin source repository shows th
 #### Running as a test framework ####
 If you wish to support cucumber running as a test framework (via the test task) then the following settings should be placed in the build file instead:
 
-    val testIntegration = "templemore" %% "sbt-cucumber-integration" % "0.7.0" % "test"
-
     lazy val myProject = Project ("my-project", file ("."),
                                   settings = Defaults.defaultSettings ++ 
-                                             CucumberPlugin.cucumberSettingsWithTestPhaseIntegration ++
-                                             Seq(libraryDependencies ++= Seq(testIntegration)))
+                                             CucumberPlugin.cucumberSettingsWithTestPhaseIntegration)
 
 ## Customisation ##
 The plugin supports a number of customisations and settings. Note that these setting customisations only apply to running using the standalone 'cucumber' task. Running cucumber as a test framework does not support any customisation options.

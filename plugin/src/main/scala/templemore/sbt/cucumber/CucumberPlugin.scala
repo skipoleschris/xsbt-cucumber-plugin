@@ -11,8 +11,6 @@ import templemore.sbt.util._
 object CucumberPlugin extends Plugin with Integration {
 
   private val projectVersion = "0.7.0"
-  private val CucumberVersionForScala2_9 = "1.0.9"
-  private val CucumberVersionForScala2_10 = "1.1.1"
 
   type LifecycleCallback = () => Unit
 
@@ -67,16 +65,11 @@ object CucumberPlugin extends Plugin with Integration {
   private def defaultBefore() = {}
   private def defaultAfter() = {}
 
-  private def cucumberVersion(scalaVersion: String) = 
-    if ( scalaVersion.startsWith("2.10") ) CucumberVersionForScala2_10 else CucumberVersionForScala2_9
-
   private def cucumberMain(scalaVersion: String) = 
     if ( scalaVersion.startsWith("2.10") ) "cucumber.api.cli.Main" else "cucumber.cli.Main"
 
   val cucumberSettings: Seq[Setting[_]] = Seq(
-    libraryDependencies <+= scalaVersion { sv =>
-      "info.cukes" % "cucumber-scala" % cucumberVersion(sv) % "test"      
-    },
+    libraryDependencies += "templemore" %% "sbt-cucumber-integration" % projectVersion % "test",
 
     cucumber <<= inputTask(cucumberTask),
     cucumberTestSettings <<= cucumberSettingsTask,
@@ -90,7 +83,6 @@ object CucumberPlugin extends Plugin with Integration {
 
     cucumberMainClass <<= (scalaVersion) { sv => cucumberMain(sv) },
     cucumberFeaturesLocation := "classpath:",
-    // Replaced with cucumber on the classpath: cucumberFeaturesLocation <<= (baseDirectory) { (_ / "src" / "test" / "features").getPath },
     cucumberStepsBasePackage := "",
     cucumberExtraOptions := List.empty[String],
 
@@ -109,9 +101,6 @@ object CucumberPlugin extends Plugin with Integration {
   )
 
   val cucumberSettingsWithTestPhaseIntegration = cucumberSettings ++ Seq(
-    libraryDependencies ++= Seq(
-      "templemore" %% "sbt-cucumber-integration" % projectVersion % "test"
-    ),
     testFrameworks += new TestFramework("templemore.sbt.cucumber.CucumberFramework")
   ) 
 }

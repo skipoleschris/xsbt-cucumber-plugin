@@ -21,7 +21,7 @@ class CucumberFramework extends Framework {
 }
 
 class CucumberRunner(testClassLoader: ClassLoader, loggers: Array[Logger]) extends Runner2 {
-  private val cucumber = new ReflectingCucumberLauncher(debug = logDebug, error = logError)
+  private val cucumber = new CucumberLauncher(debug = logDebug, error = logError)
 
   def run(testClassName: String, fingerprint: Fingerprint, eventHandler: EventHandler, args: Array[String]) = try {
     val arguments = Array("--glue", "", "--format", "pretty", "classpath:")
