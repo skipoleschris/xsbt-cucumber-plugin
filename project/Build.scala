@@ -10,7 +10,8 @@ object Settings {
                       Seq (organization  := buildOrganization,
                            scalaVersion  := buildScalaVersion,
                            version       := buildVersion,
-                           scalacOptions += "-deprecation")
+                           scalacOptions += "-deprecation",
+                           publishTo := Some(Resolver.file("file",  new File("deploy-repo"))))
 }
 
 object Dependencies {
@@ -32,7 +33,8 @@ object Build extends Build {
   import Settings._
 
   lazy val parentProject = Project("sbt-cucumber-parent", file ("."),
-    settings = buildSettings) aggregate (pluginProject, integrationProject)
+    settings = buildSettings ++
+               Seq(crossScalaVersions := Seq("2.9.2", "2.10.0-RC2"))) aggregate (pluginProject, integrationProject)
 
   lazy val pluginProject = Project("sbt-cucumber-plugin", file ("plugin"),
     settings = buildSettings ++ 
@@ -40,7 +42,7 @@ object Build extends Build {
 
   lazy val integrationProject = Project ("sbt-cucumber-integration", file ("integration"),
     settings = buildSettings ++ 
-               Seq(crossScalaVersions := Seq("2.9.2", "2.10.0-RC1", "2.10.0-RC2"),
+               Seq(crossScalaVersions := Seq("2.9.2", "2.10.0-RC2"),
                    libraryDependencies <+= scalaVersion { sv => cucumberScala(sv) },
                    libraryDependencies += testInterface))
 }

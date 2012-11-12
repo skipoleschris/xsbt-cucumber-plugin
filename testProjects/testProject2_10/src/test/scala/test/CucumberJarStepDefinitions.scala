@@ -2,6 +2,7 @@ package test
 
 import cucumber.api.scala.{ScalaDsl, EN}
 import org.scalatest.matchers.ShouldMatchers
+import templemore.sbt.cucumber.RunCucumber
 
 class CucumberJarStepDefinitions extends ScalaDsl with EN with ShouldMatchers {
 
@@ -21,3 +22,5 @@ class CucumberJarStepDefinitions extends ScalaDsl with EN with ShouldMatchers {
     whenCalled should be (true)
   }
 }
+
+class CucumberSuite extends RunCucumber

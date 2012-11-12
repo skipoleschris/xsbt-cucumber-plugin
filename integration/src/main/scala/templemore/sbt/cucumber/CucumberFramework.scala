@@ -24,8 +24,7 @@ class CucumberRunner(testClassLoader: ClassLoader, loggers: Array[Logger]) exten
   private val cucumber = new CucumberLauncher(debug = logDebug, error = logError)
 
   def run(testClassName: String, fingerprint: Fingerprint, eventHandler: EventHandler, args: Array[String]) = try {
-    val arguments = Array("--glue", "", "--format", "pretty", "classpath:")
-
+    val arguments = Array("--glue", "", "--format", "pretty") ++ processArgs(args) ++ Array("classpath:")
     cucumber(arguments, testClassLoader) match {
       case 0 => 
         logDebug("Cucumber tests completed successfully")
@@ -35,7 +34,17 @@ class CucumberRunner(testClassLoader: ClassLoader, loggers: Array[Logger]) exten
         eventHandler.handle(FailureEvent(testClassName))
     }
   } catch {
-    case e => eventHandler.handle(ErrorEvent(testClassName, e))
+    case e: Exception => eventHandler.handle(ErrorEvent(testClassName, e))
+  }
+
+  private def processArgs(args: Array[String]): Array[String] = {
+    def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~")
+    def isNotATag(arg: String) = !isATag(arg)
+    def makeOptionsList(options: Array[String], flag: String) = options flatMap(List(flag, _))
+
+    val tagsFromArgs = args.filter(isATag)
+    val namesFromArgs = args.filter(isNotATag)
+    makeOptionsList(tagsFromArgs, "--tags") ++ makeOptionsList(namesFromArgs, "--name")
   }
 
   private def logError(message: String) = loggers foreach (_ error message)

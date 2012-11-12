@@ -22,11 +22,6 @@ object BuildSettings {
 object Dependencies {
 
   val scalaTest = "org.scalatest" %% "scalatest" % "1.7.2" % "test"
-
-  // NOTE: This dependency is only required when using 'test' task integration
-  val testIntegration = "templemore" %% "sbt-cucumber-integration" % "0.7.0" % "test"
- 
-  val testDeps = Seq(scalaTest, testIntegration)
 }
 
 object TestProjectBuild extends Build {
@@ -38,8 +33,8 @@ object TestProjectBuild extends Build {
 
 
   lazy val jarProject = Project ("jar-project", file ("jar-project"),
-           settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies ++= testDeps))
+           settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies += scalaTest))
 
   lazy val warProject = Project ("war-project", file ("war-project"),
-           settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies ++= testDeps)) dependsOn (jarProject)
+           settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies += scalaTest)) dependsOn (jarProject)
 }

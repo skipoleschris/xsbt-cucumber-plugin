@@ -1,16 +1,16 @@
-name := "test-project"
+name := "test-project2_10"
 
 version := "0.7.0"
 
 organization := "templemore"
 
-scalaVersion := "2.10.0-RC1"
+scalaVersion := "2.10.0-RC2"
 
 libraryDependencies ++= Seq(
-	"org.scalatest" % "scalatest_2.10.0-RC1" % "1.8-2.10.0-RC1-B1" % "test"
+	"org.scalatest" % "scalatest_2.10.0-RC2" % "1.8" % "test"
 )
 
-seq(cucumberSettings : _*)
+seq(cucumberSettingsWithTestPhaseIntegration : _*)
 
 cucumberStepsBasePackage := "test"
 

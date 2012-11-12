@@ -6,21 +6,12 @@ An [sbt 0.12.x](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumbe
 ### IMPORTANT NOTES ABOUT THIS RELEASE (0.7.0) ###
 It adds the ability to run cucumber as a standalone SBT task but also as a test runner within the standard 'test' task. To facilitate this, there has been one significant change that you should be aware of: the default location for feature files has changed from the src/test/features directory to the classpath. This is required as running as a test framework only has access to the test classpath. Features should therefore now live under src/test/resources. It is possible to change this back to another location by overriding the cucumberFeaturesLocation setting, but if you change this to anything other than the classpath then the 'test' task will not be able to find features.
 
-### EXPERIMENTAL RELEASE ###
-This is currently an experimental release of the ability to run cucumber as a standard SBT test framework. The basic mechanisms are in place, but currently the following are broken / do not work:
-
-* Currently MAY not work with Scala 2.10.0-RC1 (I've only been testing against 2.9.2 projects and need to cross-build the integration project to allow it to work)
-* There is currently no support for 'test-only' and no way to just run features with specific names or tags
-* When running in a multi-project setup, the cucumbers for each project are run in parallel and the output is interleaved and thus unreadable.
-
-This version is not published to any repository. You can build it locally using the SBT tasks: package and publish-local.
-
 ## Overview ##
 Provides the ability to run Cucumber-jvm within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
 
 * Works with xsbt 0.12.0
-* Works with cucumber-jvm (version 1.0.9 for Scala 2.9.x and version 1.1.1 for Scala 2.10.0-RC1)
-* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-RC1 
+* Works with cucumber-jvm (version 1.0.9 for Scala 2.9.x and version 1.1.1 for Scala 2.10.0-RC1/RC2)
+* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-RC1/RC2 
 
 ## Usage - Standalone Task ##
 Install the plugin (see later). By default features files go in the 'src/test/resources' directory. Step definitions go in 'src/test/scala'. Finally from the sbt console call the task:
@@ -53,7 +44,10 @@ This is required to trigger cucumber to run (as SBT only runs tests that extends
 
 Note that none of the configuration options apply when running via a test framework. This is because the SBT test integration does not allow any access to these settings. Cucumber will be executed with pretty output to the console, searching the classpath from its root for features and executing all tests found in packages.
 
-TODO: Support for test-only that runs cucumber just once but supporting tag and name arguments.
+It is also possible to filter exactly which features get executed by using the test-only task. To do this, specify the CucumberSuite that you defined above as the test to run and then use either the tag or name approach already described as the test arguments:
+
+      test-only mypackage.CucumberSuite -- @demo
+      test-only mypackage.CucumberSuite -- "User admin"
 
 ## Writing Features ##
 Features are written in text format and are placed in .feature files inside the 'src/test/resources' directory. For more info on writing features please see the [Cucumber](http://cukes.info) website.
@@ -138,6 +132,8 @@ To add the cucumber plugin settings to a full configuration (often a multi-modul
     }
 
 The testProjects/multiModuleTestProject in the plugin source repository shows this setup in a multi-module project.
+
+Note that because SBT runs builds for different projects in parallel it will often try to run cucumber/test goals for multiple modules at once. This results in interleaving of the output written to the console. For multi-module builds using the cucumber task it is best to change the output settings to generate reports rather than console output. Unfortunately this is not possible when using the test task, so the recommended approach is to run the test task against each project module individually.
 
 #### Running as a test framework ####
 If you wish to support cucumber running as a test framework (via the test task) then the following settings should be placed in the build file instead:

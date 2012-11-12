@@ -70,7 +70,7 @@ class CucumberLauncher(debug: (String) => Unit, error: (String) => Unit) {
     CucumberRuntime(runtime, options, loader, 
                     options.formatter(classLoader), options.reporter(classLoader), new SummaryPrinter(System.out))
   } catch {
-    case e => 
+    case e: Exception => 
       error("Unable to construct cucumber runtime. Please report this as an error. (Details: " + e.getMessage + ")")
       throw e
   }
