@@ -10,7 +10,7 @@ import templemore.sbt.util._
  */
 object CucumberPlugin extends Plugin with Integration {
 
-  private val projectVersion = "0.7.0"
+  private val projectVersion = "0.7.1"
 
   type LifecycleCallback = () => Unit
 
@@ -69,6 +69,7 @@ object CucumberPlugin extends Plugin with Integration {
     if ( scalaVersion.startsWith("2.10") ) "cucumber.api.cli.Main" else "cucumber.cli.Main"
 
   val cucumberSettings: Seq[Setting[_]] = Seq(
+    resolvers += "Templemore Repository" at "http://templemore.co.uk/repo",
     libraryDependencies += "templemore" %% "sbt-cucumber-integration" % projectVersion % "test",
 
     cucumber <<= inputTask(cucumberTask),
@@ -102,5 +103,10 @@ object CucumberPlugin extends Plugin with Integration {
 
   val cucumberSettingsWithTestPhaseIntegration = cucumberSettings ++ Seq(
     testFrameworks += new TestFramework("templemore.sbt.cucumber.CucumberFramework")
+  ) 
+
+  val cucumberSettingsWithIntegrationTestPhaseIntegration = cucumberSettings ++ Seq(
+    testFrameworks in IntegrationTest += new TestFramework("templemore.sbt.cucumber.CucumberFramework"),
+    libraryDependencies += "templemore" %% "sbt-cucumber-integration" % projectVersion % "it"
   ) 
 }

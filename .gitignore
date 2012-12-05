@@ -5,3 +5,5 @@ project/target
 .idea/workspace.xml
 .ensime_port
 xsbt-cucumber-plugin.sublime-workspace
+deploy-repo
+

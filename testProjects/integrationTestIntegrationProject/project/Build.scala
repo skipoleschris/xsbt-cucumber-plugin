@@ -12,29 +12,22 @@ object BuildSettings {
                            scalaVersion := buildScalaVersion,
                            version      := buildVersion)
 
-  // NOTE: If not worried about integration with the 'test' task then use:
-  //   CucumberPlugin.cucumberSettings instead of CucumberPlugin.cucumberSettingsWithTestPhaseIntegration
-  val cucumberSettings = CucumberPlugin.cucumberSettingsWithTestPhaseIntegration ++
+  val cucumberSettings = CucumberPlugin.cucumberSettingsWithIntegrationTestPhaseIntegration ++
                          Seq(CucumberPlugin.cucumberHtmlReport := true,
                              CucumberPlugin.cucumberPrettyReport := true)
 }
 
 object Dependencies {
 
-  val scalaTest = "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+  val scalaTest = "org.scalatest" %% "scalatest" % "1.7.2" % "it"
 }
 
 object TestProjectBuild extends Build {
   import Dependencies._
   import BuildSettings._
 
-  lazy val multiModuleTestProject = Project ("test-project", file ("."),
-           settings = buildSettings) aggregate (jarProject, warProject)
-
-
-  lazy val jarProject = Project ("jar-project", file ("jar-project"),
+  lazy val integrationTestProject = Project ("integration-test-project", file ("."),
            settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies += scalaTest))
-
-  lazy val warProject = Project ("war-project", file ("war-project"),
-           settings = buildSettings ++ cucumberSettings ++ Seq (libraryDependencies += scalaTest)) dependsOn (jarProject)
+           .configs(IntegrationTest)
+           .settings(Defaults.itSettings : _*)
 }

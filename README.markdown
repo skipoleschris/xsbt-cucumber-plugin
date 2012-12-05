@@ -3,8 +3,8 @@ xsbt-cucumber-plugin
 
 An [sbt 0.12.x](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features.
 
-### IMPORTANT NOTES ABOUT THIS RELEASE (0.7.0) ###
-It adds the ability to run cucumber as a standalone SBT task but also as a test runner within the standard 'test' task. To facilitate this, there has been one significant change that you should be aware of: the default location for feature files has changed from the src/test/features directory to the classpath. This is required as running as a test framework only has access to the test classpath. Features should therefore now live under src/test/resources. It is possible to change this back to another location by overriding the cucumberFeaturesLocation setting, but if you change this to anything other than the classpath then the 'test' task will not be able to find features.
+### IMPORTANT NOTES ABOUT THIS RELEASE (0.7.x) ###
+It adds the ability to run cucumber as a standalone SBT task but also as a test runner within the standard 'test' task (either within the Test or within the IntegrationTest configs). To facilitate this, there has been one significant change that you should be aware of: the default location for feature files has changed from the src/test/features directory to the classpath. This is required as running as a test framework only has access to the test classpath. Features should therefore now live under src/test/resources. It is possible to change this back to another location by overriding the cucumberFeaturesLocation setting, but if you change this to anything other than the classpath then the 'test' task will not be able to find features.
 
 ## Overview ##
 Provides the ability to run Cucumber-jvm within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
@@ -48,6 +48,24 @@ It is also possible to filter exactly which features get executed by using the t
 
       test-only mypackage.CucumberSuite -- @demo
       test-only mypackage.CucumberSuite -- "User admin"
+
+## Usage - Integration Test Framework ##
+Install the plugin and additional integration test framework integration (see later). Feature files MUST go in the 'src/it/resources' directory as only the classpath is visible to test frameworks. Step definitions go in 'src/it/scala'. 
+
+There must also be present somewhere in the test code the following class:
+
+  class CucumberSuite extends templemore.sbt.cucumber.RunCucumber
+
+This is required to trigger cucumber to run (as SBT only runs tests that extends a specific base class or have a specific annotation). There MUST only be one instance of a class extending RunCucumber in the test code as we only want cucumber to be executed once! Finally from the sbt console call the task:
+
+    it:test
+
+Note that none of the configuration options apply when running via a test framework. This is because the SBT integration test integration does not allow any access to these settings. Cucumber will be executed with pretty output to the console, searching the classpath from its root for features and executing all tests found in packages.
+
+It is also possible to filter exactly which features get executed by using the test-only task. To do this, specify the CucumberSuite that you defined above as the test to run and then use either the tag or name approach already described as the test arguments:
+
+      it:test-only mypackage.CucumberSuite -- @demo
+      it:test-only mypackage.CucumberSuite -- "User admin"
 
 ## Writing Features ##
 Features are written in text format and are placed in .feature files inside the 'src/test/resources' directory. For more info on writing features please see the [Cucumber](http://cukes.info) website.
@@ -102,7 +120,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.0")
+    addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.1")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -141,6 +159,17 @@ If you wish to support cucumber running as a test framework (via the test task) 
     lazy val myProject = Project ("my-project", file ("."),
                                   settings = Defaults.defaultSettings ++ 
                                              CucumberPlugin.cucumberSettingsWithTestPhaseIntegration)
+
+#### Running as an integration test framework ####
+If you wish to support cucumber running as an integration test framework (via the it:test task) then use this alternative settings group instead:
+
+    lazy val myProject = Project ("my-project", file ("."),
+                                  settings = Defaults.defaultSettings ++ 
+                                             CucumberPlugin.cucumberSettingsWithIntegrationTestPhaseIntegration)
+                                   .configs(IntegrationTest)
+                                   .settings(Defaults.itSettings : _*)
+
+This will ensure the necessary jars and test frameworks are installed in the IntegrationTest config as opposed to the normal Test config. For more information about setting up an IntegrationTest config see the testProjects/integrationTestIntegrationProject or http://www.scala-sbt.org/release/docs/Detailed-Topics/Testing.
 
 ## Customisation ##
 The plugin supports a number of customisations and settings. Note that these setting customisations only apply to running using the standalone 'cucumber' task. Running cucumber as a test framework does not support any customisation options.
@@ -183,6 +212,11 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.7.1 ###
+
+Fix for issue #15. The templemore repository is now added as a resolver to the project when the plugin is added.
+Fix for issue #14. It is now possible to run cucumber within the IntegrationTest config.
 
 ### 0.7.0 ###
 
