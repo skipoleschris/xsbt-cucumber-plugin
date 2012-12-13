@@ -120,7 +120,7 @@ To install the cucumber plugin, add entries to the build plugins file (project/p
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.1")
+    addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.2")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -212,6 +212,10 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.7.2 ###
+
+Fix for issue #16. Failing cucumber tests now cause the build to report an error.
 
 ### 0.7.1 ###
 

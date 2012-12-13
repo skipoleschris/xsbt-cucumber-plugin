@@ -10,7 +10,7 @@ import templemore.sbt.util._
  */
 object CucumberPlugin extends Plugin with Integration {
 
-  private val projectVersion = "0.7.1"
+  private val projectVersion = "0.7.2"
 
   type LifecycleCallback = () => Unit
 
@@ -43,7 +43,12 @@ object CucumberPlugin extends Plugin with Integration {
   val cucumberAfter = SettingKey[LifecycleCallback]("cucumber-after")
 
   protected def cucumberTask(argTask: TaskKey[Seq[String]]) =
-    (argTask, cucumberTestSettings, cucumberOptions, cucumberOutput, streams) map(cuke)
+    (argTask, cucumberTestSettings, cucumberOptions, cucumberOutput, streams) map {
+      (args, settings, opt, out, s) => cuke(args, settings, opt, out, s) match {
+        case 0 => 0
+        case _ => sys.error("There were failed tests.")
+      }
+    }
 
   protected def cucumberSettingsTask: Initialize[Task[JvmSettings]] =
     (fullClasspath in Test, cucumberMainClass, streams, cucumberSystemProperties, cucumberJVMOptions, cucumberMaxMemory, cucumberMaxPermGen) map {
