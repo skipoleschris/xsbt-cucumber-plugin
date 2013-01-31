@@ -33,6 +33,25 @@ trait Integration {
     }
   }
 
+  /*
+   * The options that are supported by the plugin.
+   * This excludes options that are set in other places such as formatting
+   * and dotcucumber etc.
+   *
+   * This is essentially a list of the parameter-less options supported by the
+   * `cucumber-jvm` `cucumber.runtime.RuntimeOptions` class
+   *
+   * The `--no-xxx` version of the options are not included as they are not enabled
+   * by default and are therefore not really necessary.
+   */
+  private val supportedOptions = Seq("-d",
+                                     "--dry-run",
+                                     "-s",
+                                     "--strict",
+                                     "-m",
+                                     "--monochrome")
+
+
   private def runCucumber(args: Seq[String],
                           jvmSettings: JvmSettings,
                           options: Options,
@@ -42,9 +61,7 @@ trait Integration {
     def optsFromArgs = args.filter(isAnOption).toList
     def namesFromArgs = args.filter(isAName).toList
 
-    val optionPattern = """-[a-z]""".r.pattern
-
-    def isAnOption(arg: String) = (arg.startsWith("--") || optionPattern.matcher(arg).matches())
+    def isAnOption(arg: String) = supportedOptions.contains(arg)
     def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~@")
     def isAName(arg:String) = !isATag(arg) && !isAnOption(arg)
 
