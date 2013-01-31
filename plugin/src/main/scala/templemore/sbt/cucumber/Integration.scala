@@ -9,6 +9,7 @@ import templemore.sbt.util._
  * cucumber as both a forked JVM and within the current JVM process.
  *
  * @author Chris Turner
+ * @author RandomCoder
  */
 trait Integration {
 
@@ -38,14 +39,18 @@ trait Integration {
                           output: Output,
                           log: Logger) = {
     def tagsFromArgs = args.filter(isATag).toList
-    def namesFromArgs = args.filter(isNotATag).toList
+    def optsFromArgs = args.filter(isAnOption).toList
+    def namesFromArgs = args.filter(isAName).toList
 
-    def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~")
-    def isNotATag(arg: String) = !isATag(arg)
+    val optionPattern = """-[a-z]""".r.pattern
+
+    def isAnOption(arg: String) = (arg.startsWith("--") || optionPattern.matcher(arg).matches())
+    def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~@")
+    def isAName(arg:String) = !isATag(arg) && !isAnOption(arg)
 
     log.info("Running cucumber...")
     options.beforeFunc()
-    val result = launchCucumberInSeparateJvm(jvmSettings, options, output, tagsFromArgs, namesFromArgs)
+    val result = launchCucumberInSeparateJvm(jvmSettings, options, output, tagsFromArgs, namesFromArgs, optsFromArgs)
     options.afterFunc()
     result
   }
@@ -54,7 +59,8 @@ trait Integration {
                                           options: Options,
                                           output: Output,
                                           tags: List[String], 
-                                          names: List[String]): Int = {
+                                          names: List[String],
+                                          cucumberOptions: List[String]): Int = {
     def makeOptionsList(options: List[String], flag: String) = options flatMap(List(flag, _))
 
     val cucumberParams = ("--glue" :: options.basePackage :: Nil) ++
@@ -62,6 +68,7 @@ trait Integration {
                          output.options ++
                          makeOptionsList(tags, "--tags") ++ 
                          makeOptionsList(names, "--name") ++
+                         cucumberOptions ++
                          (options.featuresLocation :: Nil)
     JvmLauncher(jvmSettings).launch(cucumberParams)
   }
