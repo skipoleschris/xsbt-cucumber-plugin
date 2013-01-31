@@ -9,6 +9,7 @@ import templemore.sbt.util._
  * cucumber as both a forked JVM and within the current JVM process.
  *
  * @author Chris Turner
+ * @author RandomCoder
  */
 trait Integration {
 
@@ -32,20 +33,41 @@ trait Integration {
     }
   }
 
+  /*
+   * The options that are supported by the plugin.
+   * This excludes options that are set in other places such as formatting
+   * and dotcucumber etc.
+   *
+   * This is essentially a list of the parameter-less options supported by the
+   * `cucumber-jvm` `cucumber.runtime.RuntimeOptions` class
+   *
+   * The `--no-xxx` version of the options are not included as they are not enabled
+   * by default and are therefore not really necessary.
+   */
+  private val supportedOptions = Seq("-d",
+                                     "--dry-run",
+                                     "-s",
+                                     "--strict",
+                                     "-m",
+                                     "--monochrome")
+
+
   private def runCucumber(args: Seq[String],
                           jvmSettings: JvmSettings,
                           options: Options,
                           output: Output,
                           log: Logger) = {
     def tagsFromArgs = args.filter(isATag).toList
-    def namesFromArgs = args.filter(isNotATag).toList
+    def optsFromArgs = args.filter(isAnOption).toList
+    def namesFromArgs = args.filter(isAName).toList
 
-    def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~")
-    def isNotATag(arg: String) = !isATag(arg)
+    def isAnOption(arg: String) = supportedOptions.contains(arg)
+    def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~@")
+    def isAName(arg:String) = !isATag(arg) && !isAnOption(arg)
 
     log.info("Running cucumber...")
     options.beforeFunc()
-    val result = launchCucumberInSeparateJvm(jvmSettings, options, output, tagsFromArgs, namesFromArgs)
+    val result = launchCucumberInSeparateJvm(jvmSettings, options, output, tagsFromArgs, namesFromArgs, optsFromArgs)
     options.afterFunc()
     result
   }
@@ -54,7 +76,8 @@ trait Integration {
                                           options: Options,
                                           output: Output,
                                           tags: List[String], 
-                                          names: List[String]): Int = {
+                                          names: List[String],
+                                          cucumberOptions: List[String]): Int = {
     def makeOptionsList(options: List[String], flag: String) = options flatMap(List(flag, _))
 
     val cucumberParams = ("--glue" :: options.basePackage :: Nil) ++
@@ -62,6 +85,7 @@ trait Integration {
                          output.options ++
                          makeOptionsList(tags, "--tags") ++ 
                          makeOptionsList(names, "--name") ++
+                         cucumberOptions ++
                          (options.featuresLocation :: Nil)
     JvmLauncher(jvmSettings).launch(cucumberParams)
   }

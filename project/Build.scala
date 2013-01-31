@@ -1,9 +1,11 @@
 import sbt._
 import Keys._
 
+import Versions._
+
 object Settings {
   val buildOrganization = "templemore"
-  val buildScalaVersion = "2.9.2"
+  val buildScalaVersion = scala2_9
   val buildVersion      = "0.7.2"
 
   val buildSettings = Defaults.defaultSettings ++
@@ -15,9 +17,6 @@ object Settings {
 }
 
 object Dependencies {
-
-  private val CucumberVersionForScala2_9 = "1.0.9"
-  private val CucumberVersionForScala2_10 = "1.1.1"
 
   def cucumberScala(scalaVersion: String) = {
     def cucumberVersion = if ( scalaVersion.startsWith("2.10") ) CucumberVersionForScala2_10 else CucumberVersionForScala2_9
@@ -32,9 +31,11 @@ object Build extends Build {
   import Dependencies._
   import Settings._
 
+  private val crossVersions = Seq(scala2_9, scala2_10)
+
   lazy val parentProject = Project("sbt-cucumber-parent", file ("."),
     settings = buildSettings ++
-               Seq(crossScalaVersions := Seq("2.9.2", "2.10.0-RC2"))) aggregate (pluginProject, integrationProject)
+               Seq(crossScalaVersions := crossVersions)) aggregate (pluginProject, integrationProject)
 
   lazy val pluginProject = Project("sbt-cucumber-plugin", file ("plugin"),
     settings = buildSettings ++ 
@@ -42,8 +43,15 @@ object Build extends Build {
 
   lazy val integrationProject = Project ("sbt-cucumber-integration", file ("integration"),
     settings = buildSettings ++ 
-               Seq(crossScalaVersions := Seq("2.9.2", "2.10.0-RC2"),
+               Seq(crossScalaVersions := crossVersions,
                    libraryDependencies <+= scalaVersion { sv => cucumberScala(sv) },
                    libraryDependencies += testInterface))
 }
 
+
+object Versions {
+  val scala2_9 = "2.9.2"
+  val scala2_10 = "2.10.0"
+  val CucumberVersionForScala2_9 = "1.0.9"
+  val CucumberVersionForScala2_10 = "1.1.1"
+}
