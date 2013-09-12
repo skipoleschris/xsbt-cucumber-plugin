@@ -1,3 +1,5 @@
 resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.2")
+resolvers += Resolver.file("local-ivy-repo", file(Path.userHome + "/.ivy2/local"))(Resolver.ivyStylePatterns)
+
+addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.3-SNAPSHOT")

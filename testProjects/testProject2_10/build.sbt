@@ -1,10 +1,10 @@
 name := "test-project2_10"
 
-version := "0.7.2"
+version := "0.7.3-SNAPSHOT"
 
 organization := "templemore"
 
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.2"
 
 libraryDependencies ++= Seq(
 	"org.scalatest" %% "scalatest" % "1.9.1" % "test"
