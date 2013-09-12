@@ -181,6 +181,9 @@ The following settings can be modified to change the behaviour of the plugin:
 * cucumberStepsBasePackage - The base package from which to search for files containing Steps. Defaults to an empty String (search all packages)
 * cucumberExtraOptions - Additional commandline options to pass to the cucumber command. Defaults to an empty List[String]
 
+You can put the strict detection of non-implemented steps on cucumberExtraOptions like this:
+    cucumberExtraOptions := List("--strict")
+
 Note: The cucumberStepsBasePackage should be set in configurations to avoid scanning the entire classpath for files containing Steps
 
 ### Output Settings ###
