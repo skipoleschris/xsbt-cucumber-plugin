@@ -11,7 +11,11 @@ case class Options(featuresLocation: String,
                    basePackage: String,
                    extraOptions: List[String],
                    beforeFunc: () => Unit,
-                   afterFunc: () => Unit) {
+                   afterFunc: () => Unit,
+                   strict: Boolean = false,
+                   monochrome: Boolean = false,
+                   dryRun: Boolean = false) {
 
   def featuresPresent = featuresLocation.startsWith("classpath:") || (new File(featuresLocation).exists)
+  def asDryRun = copy(dryRun = true)
 }

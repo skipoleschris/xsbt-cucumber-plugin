@@ -1,17 +1,14 @@
 xsbt-cucumber-plugin
 ====================
 
-An [sbt 0.12.x](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features.
-
-### IMPORTANT NOTES ABOUT THIS RELEASE (0.7.x) ###
-It adds the ability to run cucumber as a standalone SBT task but also as a test runner within the standard 'test' task (either within the Test or within the IntegrationTest configs). To facilitate this, there has been one significant change that you should be aware of: the default location for feature files has changed from the src/test/features directory to the classpath. This is required as running as a test framework only has access to the test classpath. Features should therefore now live under src/test/resources. It is possible to change this back to another location by overriding the cucumberFeaturesLocation setting, but if you change this to anything other than the classpath then the 'test' task will not be able to find features.
+An [sbt 0.13.0](https://github.com/harrah/xsbt/wiki) plugin for running [Cucumber](http://cukes.info) features.
 
 ## Overview ##
 Provides the ability to run Cucumber-jvm within the SBT environment. Originally based on the [cuke4duke-sbt-plugin](https://github.com/rubbish/cuke4duke-sbt-plugin) by rubbish and my original implementation for SBT 0.7.x. Specifics for this release:
 
-* Works with xsbt 0.12.0
-* Works with cucumber-jvm (version 1.0.9 for Scala 2.9.x and version 1.1.1 for Scala 2.10.0-RC1/RC2)
-* Allows projects compiled and running against Scala 2.9.1, 2.9.2 and 2.10.0-RC1/RC2 
+* Works with xsbt 0.13.0
+* Works with cucumber-jvm (version 1.1.4 for both Scala 2.9.3 and 2.10)
+* Allows projects compiled and running against Scala 2.9.3 and 2.10 
 
 ## Usage - Standalone Task ##
 Install the plugin (see later). By default features files go in the 'src/test/resources' directory. Step definitions go in 'src/test/scala'. Finally from the sbt console call the task:
@@ -30,6 +27,12 @@ would run features with a name matched to "User admin". Multiple arguments can b
 
 * arguments starting with @ or ~ will be passed to cucumber using the --tags flag
 * arguments starting with anything else will be passed to cucumber using the --name flag
+
+**NEW** You can also run cucumber in the dry run mode to get information on which steps have been implemented without running those steps. There is a new task for this:
+
+    cucumber-dry-run
+
+This supports all of the same command line options as the cucumber task.
 
 ## Usage - Test Framework ##
 Install the plugin and additional test framework integration (see later). Feature files MUST go in the 'src/test/resources' directory as only the classpath is visible to test frameworks. Step definitions go in 'src/test/scala'. 
@@ -87,7 +90,7 @@ The location of the features can be changed by overriding a plugin setting (see 
 Step definitions can be written in Scala, using the Scala DSL. More information on this api can be obtained from the the [Cucumber](http://cukes.info) website.
 For example:
 
-    import cucumber.runtime.{EN, ScalaDsl}
+    import cucumber.api.scala.{ScalaDsl, EN}
     import org.scalatest.matchers.ShouldMatchers
 
     class CucumberSteps extends ScalaDsl with EN with ShouldMatchers {
@@ -109,18 +112,12 @@ For example:
       }
     }
 
-NOTE: When running Scala 2.10, change the import to:
-
-    import cucumber.api.scala.{ScalaDsl, EN}
-
-This is required as the Cucumber package structure changed between the 1.0.x and 1.1.x releases
-
 ## Project Setup ##
 To install the cucumber plugin, add entries to the build plugins file (project/plugins/build.sbt) as follows:
 
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
-    addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.7.2")
+    addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.8.0")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
@@ -139,7 +136,7 @@ To add the cucumber plugin settings to a full configuration (often a multi-modul
 
     import sbt._
     import Keys._
-    import templemore.xsbt.cucumber.CucumberPlugin
+    import templemore.sbt.cucumber.CucumberPlugin
 
     object TestProjectBuild extends Build {
         import Dependencies._
@@ -180,9 +177,8 @@ The following settings can be modified to change the behaviour of the plugin:
 * cucumberFeaturesLocation - The location of the cucumber features directory within the projects. Defaults to the String "classpath:". Can be set to a specific classpath location or a full file path
 * cucumberStepsBasePackage - The base package from which to search for files containing Steps. Defaults to an empty String (search all packages)
 * cucumberExtraOptions - Additional commandline options to pass to the cucumber command. Defaults to an empty List[String]
-
-You can put the strict detection of non-implemented steps on cucumberExtraOptions like this:
-    cucumberExtraOptions := List("--strict")
+* cucumberStrict - Enables or disables strict mode. Defaults to false **NEW**
+* cucumberMonochrome - Enables or disables monochrome mode. Defaults to false **NEW**
 
 Note: The cucumberStepsBasePackage should be set in configurations to avoid scanning the entire classpath for files containing Steps
 
@@ -215,6 +211,14 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.8.0 ###
+
+Upgrade to support SBT 0.13.0 and Scala 2.10 as the default versions
+Fix for issues #26, #27 and #31. Upgrade support to Cucumber JVM 1.1.4 (for both Scala 2.9 and 2.10)
+Improvement on path for issues #20 and #21. Added support for a new task: cucumber-dry-run
+Improvement on path for issues #20 and #21. Added cucumberStatic and cucumberMonochrome settings
+Fix for issue #29. Readme has been updated
 
 ### 0.7.2 ###
 

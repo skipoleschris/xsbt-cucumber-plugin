@@ -2,8 +2,6 @@ package test
 
 import cucumber.api.scala.{ScalaDsl, EN}
 import org.scalatest.matchers.ShouldMatchers
-import templemore.sbt.cucumber.RunCucumber
-import cucumber.api.DataTable
 
 class CucumberJarStepDefinitions extends ScalaDsl with EN with ShouldMatchers {
 
@@ -21,16 +19,7 @@ class CucumberJarStepDefinitions extends ScalaDsl with EN with ShouldMatchers {
   Then("""^Cucumber is executed against the features and step definitions$""") { () =>
     givenCalled should be (true)
     whenCalled should be (true)
-  }
-
-  var tableWorks: Boolean = false
-
-  Given("""^a Data Table:$"""){ (table: DataTable) =>
-    tableWorks = true
-  }
-  Then("""^the Data Table gets parsed correctly$"""){ () =>
-    tableWorks should be (true)
+    System.getProperty("testing") should be ("true")
+    System.getProperty("demo") should be ("yes")
   }
 }
-
-class CucumberSuite extends RunCucumber

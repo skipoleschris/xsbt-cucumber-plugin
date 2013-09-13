@@ -13,9 +13,6 @@ import gherkin.formatter.Reporter
 
 class CucumberLauncher(debug: (String) => Unit, error: (String) => Unit) {
   
-  private val MultiLoaderClassName = "cucumber.runtime.io.MultiLoader"
-  private val MultiLoaderClassName_1_0_9 = "cucumber.io.MultiLoader"
-
   def apply(cucumberArguments: Array[String],
             testClassLoader: ClassLoader): Int = {
     debug("Cucumber arguments: " + cucumberArguments.mkString(" "))
@@ -76,28 +73,10 @@ class CucumberLauncher(debug: (String) => Unit, error: (String) => Unit) {
   }
 
   private def loadCucumberClasses(classLoader: ClassLoader) = try {
-    val multiLoaderClassName = cucumberVersion(classLoader) match {
-      case "1.0.9" => MultiLoaderClassName_1_0_9
-      case _ => MultiLoaderClassName
-    } 
-
-    classLoader.loadClass(multiLoaderClassName)
+    classLoader.loadClass("cucumber.runtime.io.MultiLoader")
   } catch {
     case e: ClassNotFoundException =>
       error("Unable to load Cucumber classes. Please check your project dependencies. (Details: " + e.getMessage + ")")
       throw e
-  }
-
-  private def cucumberVersion(classLoader: ClassLoader) = {
-    val stream = classLoader.getResourceAsStream("cucumber/version.properties")
-    try {
-      val props = new Properties()
-      props.load(stream)
-      val version = props.getProperty("cucumber-jvm.version")
-      debug("Determined cucumber-jvm version to be: " + version)
-      version
-    } finally {
-      stream.close()
-    }
   }
 }

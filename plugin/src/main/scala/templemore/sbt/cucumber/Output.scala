@@ -26,7 +26,7 @@ case class Output(prettyReport: Boolean, htmlReport: Boolean, junitReport: Boole
      } else Nil) ++
     (if ( jsonReport) {
        jsonReportFile.getParentFile.mkdirs()
-       "--format" :: "json-pretty:%s".format(jsonReportFile.getPath) :: Nil
+       "--format" :: "json:%s".format(jsonReportFile.getPath) :: Nil
      } else Nil)
   }
 }
