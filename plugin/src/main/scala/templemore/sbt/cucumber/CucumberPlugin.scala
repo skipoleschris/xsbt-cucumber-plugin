@@ -10,11 +10,12 @@ import templemore.sbt.util._
  */
 object CucumberPlugin extends Plugin with Integration {
 
-  private val projectVersion = "0.7.3-SNAPSHOT"
+  private val projectVersion = "0.8.0"
 
   type LifecycleCallback = () => Unit
 
   val cucumber = InputKey[Int]("cucumber")
+  val cucumberDryRun = InputKey[Int]("cucumber-dry-run")
   val cucumberTestSettings = TaskKey[JvmSettings]("cucumber-settings")
   val cucumberOptions = TaskKey[Options]("cucumber-options")
   val cucumberOutput = TaskKey[Output]("cucumber-output")
@@ -29,6 +30,9 @@ object CucumberPlugin extends Plugin with Integration {
   val cucumberStepsBasePackage = SettingKey[String]("cucumber-steps-base-package")
   val cucumberExtraOptions = SettingKey[List[String]]("cucumber-extra-options")
 
+  val cucumberStrict = SettingKey[Boolean]("cucumber-strict")
+  val cucumberMonochrome = SettingKey[Boolean]("cucumber-monochrome")
+
   val cucumberPrettyReport = SettingKey[Boolean]("cucumber-pretty-report")
   val cucumberHtmlReport = SettingKey[Boolean]("cucumber-html-report")
   val cucumberJunitReport = SettingKey[Boolean]("cucumber-junit-report")
@@ -42,24 +46,31 @@ object CucumberPlugin extends Plugin with Integration {
   val cucumberBefore = SettingKey[LifecycleCallback]("cucumber-before")
   val cucumberAfter = SettingKey[LifecycleCallback]("cucumber-after")
 
-  protected def cucumberTask(argTask: TaskKey[Seq[String]]) =
-    (argTask, cucumberTestSettings, cucumberOptions, cucumberOutput, streams) map {
-      (args, settings, opt, out, s) => cuke(args, settings, opt, out, s) match {
-        case 0 => 0
-        case _ => sys.error("There were failed tests.")
-      }
-    }
+  val parser = Def.spaceDelimited()
 
-  protected def cucumberSettingsTask: Initialize[Task[JvmSettings]] =
+  protected def cucumberTask(dryRun: Boolean = false) = Def.inputTask({
+    val args = Def.spaceDelimited("<args>").parsed
+    val settings = cucumberSettingsTask.value
+    val opt = cucumberOptions.value
+    val out = cucumberOutput.value
+    val s = streams.value
+
+    cuke(args, settings, if (dryRun) opt.asDryRun else opt, out, s) match {
+      case 0 => 0
+      case _ => sys.error("There were failed tests.")
+    }
+  })
+
+  protected def cucumberSettingsTask =
     (fullClasspath in Test, cucumberMainClass, streams, cucumberSystemProperties, cucumberJVMOptions, cucumberMaxMemory, cucumberMaxPermGen) map {
       (cp, mc, s, sp, jvmopt, mm, mpg) => JvmSettings(cp.toList.map(_.data), mc, LoggedOutput(s.log), sp, jvmopt, Some(mm), Some(mpg))
     }
 
-  protected def cucumberOptionsTask: Initialize[Task[Options]] =
+  protected def cucumberOptionsTask =
     (cucumberFeaturesLocation, cucumberStepsBasePackage, cucumberExtraOptions,
-     cucumberBefore, cucumberAfter) map ((fl, bp, o, bf, af) => Options(fl, bp, o, bf, af))
+     cucumberBefore, cucumberAfter, cucumberStrict, cucumberMonochrome) map ((fl, bp, o, bf, af, st, mo) => Options(fl, bp, o, bf, af, st, mo))
 
-  protected def cucumberOutputTask: Initialize[Task[Output]] =
+  protected def cucumberOutputTask =
     (cucumberPrettyReport, cucumberHtmlReport, cucumberJunitReport, cucumberJsonReport,
      cucumberPrettyReportFile, cucumberHtmlReportDir, cucumberJunitReportFile, cucumberJsonReportFile) map {
       (pR, hR, juR, jsR, pRF, hRD, juRF, jsRF) => {
@@ -70,14 +81,12 @@ object CucumberPlugin extends Plugin with Integration {
   private def defaultBefore() = {}
   private def defaultAfter() = {}
 
-  private def cucumberMain(scalaVersion: String) = 
-    if ( scalaVersion.startsWith("2.10") ) "cucumber.api.cli.Main" else "cucumber.cli.Main"
-
   val cucumberSettings: Seq[Setting[_]] = Seq(
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo",
     libraryDependencies += "templemore" %% "sbt-cucumber-integration" % projectVersion % "test",
 
-    cucumber <<= inputTask(cucumberTask),
+    cucumber <<= cucumberTask(false),
+    cucumberDryRun <<= cucumberTask(true),
     cucumberTestSettings <<= cucumberSettingsTask,
     cucumberOptions <<= cucumberOptionsTask,
     cucumberOutput <<= cucumberOutputTask,
@@ -87,10 +96,13 @@ object CucumberPlugin extends Plugin with Integration {
     cucumberSystemProperties := Map.empty[String, String],
     cucumberJVMOptions := Nil,
 
-    cucumberMainClass <<= (scalaVersion) { sv => cucumberMain(sv) },
+    cucumberMainClass := "cucumber.api.cli.Main",
     cucumberFeaturesLocation := "classpath:",
     cucumberStepsBasePackage := "",
     cucumberExtraOptions := List.empty[String],
+
+    cucumberStrict := false,
+    cucumberMonochrome := false,
 
     cucumberPrettyReport := false,
     cucumberHtmlReport := false,

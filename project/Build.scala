@@ -3,29 +3,25 @@ import Keys._
 
 object Settings {
   val buildOrganization = "templemore"
-  val buildScalaVersion = "2.9.2"
-  val buildVersion      = "0.7.3-SNAPSHOT"
+  val buildScalaVersion = "2.10.2"
+  val crossBuildScalaVersions = Seq("2.9.3", "2.10.2")
+  val buildVersion      = "0.8.0"
 
   val buildSettings = Defaults.defaultSettings ++
                       Seq (organization  := buildOrganization,
                            scalaVersion  := buildScalaVersion,
                            version       := buildVersion,
-                           scalacOptions += "-deprecation",
+                           scalacOptions ++= Seq("-deprecation", "-unchecked", "-encoding", "utf8"),
                            publishTo     := Some(Resolver.file("file",  new File("deploy-repo"))))
 }
 
 object Dependencies {
 
-  private val CucumberVersionForScala2_9 = "1.0.9"
-  private val CucumberVersionForScala2_10 = "1.1.4"
+  private val CucumberVersion = "1.1.4"
 
-  def cucumberScala(scalaVersion: String) = {
-    if ( scalaVersion.startsWith("2.10") ) {
-      "info.cukes" %% "cucumber-scala" % CucumberVersionForScala2_10 % "compile"
-    } else {
-      "info.cukes" % "cucumber-scala" % CucumberVersionForScala2_9 % "compile"
-    }
-  }
+  def cucumberJvm(scalaVersion: String) = 
+    if ( scalaVersion.startsWith("2.9") ) "info.cukes" % "cucumber-scala_2.9" % CucumberVersion % "compile"
+    else "info.cukes" %% "cucumber-scala" % CucumberVersion % "compile"
 
   val testInterface = "org.scala-tools.testing" % "test-interface" % "0.5" % "compile"
 }
@@ -35,17 +31,16 @@ object Build extends Build {
   import Settings._
 
   lazy val parentProject = Project("sbt-cucumber-parent", file ("."),
-    settings = buildSettings ++
-               Seq(crossScalaVersions := Seq("2.9.2", "2.10.2"))) aggregate (pluginProject, integrationProject)
+    settings = buildSettings)
 
   lazy val pluginProject = Project("sbt-cucumber-plugin", file ("plugin"),
     settings = buildSettings ++
-               Seq(sbtPlugin := true))
+               Seq(crossScalaVersions := Seq.empty, sbtPlugin := true))
 
   lazy val integrationProject = Project ("sbt-cucumber-integration", file ("integration"),
     settings = buildSettings ++ 
-               Seq(crossScalaVersions := Seq("2.9.2", "2.10.2"),
-                   libraryDependencies <+= scalaVersion { sv => cucumberScala(sv) },
-                   libraryDependencies += testInterface))
+               Seq(crossScalaVersions := crossBuildScalaVersions,
+               libraryDependencies <+= scalaVersion { sv => cucumberJvm(sv) },
+               libraryDependencies += testInterface))
 }
 

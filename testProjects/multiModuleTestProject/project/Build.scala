@@ -4,24 +4,22 @@ import templemore.sbt.cucumber.CucumberPlugin
 
 object BuildSettings {
   val buildOrganization = "templemore"
-  val buildScalaVersion = "2.9.2"
-  val buildVersion      = "0.7.2"
+  val buildScalaVersion = "2.10.2"
+  val buildVersion      = "0.8.0"
 
   val buildSettings = Defaults.defaultSettings ++
                       Seq (organization := buildOrganization,
                            scalaVersion := buildScalaVersion,
                            version      := buildVersion)
 
-  // NOTE: If not worried about integration with the 'test' task then use:
-  //   CucumberPlugin.cucumberSettings instead of CucumberPlugin.cucumberSettingsWithTestPhaseIntegration
-  val cucumberSettings = CucumberPlugin.cucumberSettingsWithTestPhaseIntegration ++
+  val cucumberSettings = CucumberPlugin.cucumberSettings ++
                          Seq(CucumberPlugin.cucumberHtmlReport := true,
                              CucumberPlugin.cucumberPrettyReport := true)
 }
 
 object Dependencies {
 
-  val scalaTest = "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+  val scalaTest = "org.scalatest" %% "scalatest" % "1.9.2" % "test"
 }
 
 object TestProjectBuild extends Build {

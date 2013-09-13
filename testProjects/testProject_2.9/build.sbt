@@ -1,10 +1,10 @@
-name := "test-project2_10"
+name := "test-project"
 
 version := "0.8.0"
 
 organization := "templemore"
 
-scalaVersion := "2.10.2"
+scalaVersion := "2.9.3"
 
 libraryDependencies ++= Seq(
 	"org.scalatest" %% "scalatest" % "1.9.2" % "test"
@@ -19,3 +19,8 @@ cucumberHtmlReport := true
 cucumberJunitReport := true 
 
 cucumberJsonReport := true
+
+cucumberSystemProperties := Map("testing" -> "true", "demo" -> "yes")
+
+cucumberJVMOptions := List("-showversion", "-esa")
+

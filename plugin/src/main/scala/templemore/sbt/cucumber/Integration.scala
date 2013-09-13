@@ -56,13 +56,20 @@ trait Integration {
                                           tags: List[String], 
                                           names: List[String]): Int = {
     def makeOptionsList(options: List[String], flag: String) = options flatMap(List(flag, _))
+    def prependOption(name: String)(on: Boolean, list: List[String]) = if (on) ("--%s".format(name) :: list) else list
+
+    val monochrome = prependOption("monochrome")_
+    val strict = prependOption("strict")_
+    val dryRun = prependOption("dry-run")_
+    def additionalOptions = monochrome(options.monochrome, strict(options.strict, dryRun(options.dryRun, options.extraOptions))) 
 
     val cucumberParams = ("--glue" :: options.basePackage :: Nil) ++
-                         options.extraOptions ++ 
+                         additionalOptions ++ 
                          output.options ++
                          makeOptionsList(tags, "--tags") ++ 
                          makeOptionsList(names, "--name") ++
                          (options.featuresLocation :: Nil)
     JvmLauncher(jvmSettings).launch(cucumberParams)
   }
+
 }

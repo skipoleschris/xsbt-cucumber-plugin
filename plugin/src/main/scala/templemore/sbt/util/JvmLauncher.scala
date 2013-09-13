@@ -21,7 +21,8 @@ case class JvmLauncher(settings: JvmSettings) {
   def launch(params: List[String]): Int = {
     val args = jvmArgs ++ (settings.mainClass :: params)
     settings.outputStrategy.asInstanceOf[LoggedOutput].logger.debug(args mkString " ")
-    Fork.java(None, args, None, Map.empty[String, String], settings.outputStrategy)
+    val forkOptions = ForkOptions(None, Some(settings.outputStrategy))
+    Fork.java(forkOptions, args)
   }
 
   protected def makeClasspath = settings.classpath map (_.getPath) mkString File.pathSeparator
