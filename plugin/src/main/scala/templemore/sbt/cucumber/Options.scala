@@ -14,8 +14,10 @@ case class Options(featuresLocation: String,
                    afterFunc: () => Unit,
                    strict: Boolean = false,
                    monochrome: Boolean = false,
-                   dryRun: Boolean = false) {
+                   dryRun: Boolean = false,
+                   rerun: Boolean = false) {
 
   def featuresPresent = featuresLocation.startsWith("classpath:") || (new File(featuresLocation).exists)
   def asDryRun = copy(dryRun = true)
+  def asRerun = copy(rerun = true)
 }

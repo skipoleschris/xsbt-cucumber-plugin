@@ -35,9 +35,13 @@ Multiple arguments can be supplied and honour the following rules:
 * arguments containing ":" will be appended to cucumbers arguments
 * arguments starting with anything else will be passed to cucumber using the --name flag
 
-**NEW** You can also run cucumber in the dry run mode to get information on which steps have been implemented without running those steps. There is a new task for this:
+You can run cucumber in the dry run mode to get information on which steps have been implemented without running those steps. The task for this:
 
     cucumber-dry-run
+
+You can run cucumber-rerun to run the features from cucumberRerunFile (default - cucumber.rerun.txt, generated when cucumberRerunReport is set to true). It will return an error if the file is empty or missing. Can be used with any other parameters e.g. tags, names and features:##. The task for this:
+
+    cucumber-rerun
 
 This supports all of the same command line options as the cucumber task.
 
@@ -220,6 +224,9 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.8.2 ###
+Added support for a new task: cucumber-rerun
 
 ### 0.8.1 ###
 

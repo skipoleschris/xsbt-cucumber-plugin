@@ -36,14 +36,25 @@ trait Integration {
                           jvmSettings: JvmSettings,
                           options: Options,
                           output: Output,
-                          log: Logger) = {
-    def tagsFromArgs = args.filter(isATag).toList
-    def namesFromArgs = args.filter(isAName).toList
-    def featuresFromArgs = args.filter(isAFeature).toList.map(feature => options.featuresLocation + feature)
-
+                          log: Logger): Int = {
     def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~")
     def isAFeature(arg: String) = arg.indexOf(":") != -1
     def isAName(arg: String) = !isATag(arg) && !isAFeature(arg)
+
+    def prepandFeatureLocation(features: List[String]) = features.map((feature: String) => options.featuresLocation + feature)
+
+    val tagsFromArgs = args.filter(isATag).toList
+    val namesFromArgs = args.filter(isAName).toList
+    var featuresFromArgs = prepandFeatureLocation(args.filter(isAFeature).toList)
+
+    if(options.rerun) {
+      val rerun_text = scala.io.Source.fromFile(output.rerunReportFile).mkString
+      if(rerun_text.isEmpty) {
+        log.error("Rerun file (" + output.rerunReportFile + ") is empty")
+        return -1
+      }
+      featuresFromArgs ++= prepandFeatureLocation(rerun_text.replaceAll("([:0-9]+) ", "$1|").split("\\|").toList)
+    }
 
     var info = "Running cucumber"
     if(!tagsFromArgs.isEmpty) info += " tags: " + tagsFromArgs.mkString(", ")
@@ -68,7 +79,7 @@ trait Integration {
     val monochrome = prependOption("monochrome")_
     val strict = prependOption("strict")_
     val dryRun = prependOption("dry-run")_
-    def additionalOptions = monochrome(options.monochrome, strict(options.strict, dryRun(options.dryRun, options.extraOptions))) 
+    def additionalOptions = monochrome(options.monochrome, strict(options.strict, dryRun(options.dryRun, options.extraOptions)))
 
     val cucumberParams = ("--glue" :: options.basePackage :: Nil) ++
                          additionalOptions ++ 

@@ -15,6 +15,7 @@ object CucumberPlugin extends Plugin with Integration {
   type LifecycleCallback = () => Unit
 
   val cucumber = InputKey[Int]("cucumber")
+  val cucumberRerun = InputKey[Int]("cucumber-rerun")
   val cucumberDryRun = InputKey[Int]("cucumber-dry-run")
   val cucumberTestSettings = TaskKey[JvmSettings]("cucumber-settings")
   val cucumberOptions = TaskKey[Options]("cucumber-options")
@@ -50,14 +51,17 @@ object CucumberPlugin extends Plugin with Integration {
 
   val parser = Def.spaceDelimited()
 
-  protected def cucumberTask(dryRun: Boolean = false) = Def.inputTask({
+  protected def cucumberTask(dryRun: Boolean = false, rerun: Boolean = false) = Def.inputTask({
     val args = Def.spaceDelimited("<args>").parsed
     val settings = cucumberSettingsTask.value
-    val opt = cucumberOptions.value
+    var opt = cucumberOptions.value
     val out = cucumberOutput.value
     val s = streams.value
 
-    cuke(args, settings, if (dryRun) opt.asDryRun else opt, out, s) match {
+    if(dryRun) opt = opt.asDryRun
+    if(rerun) opt = opt.asRerun
+
+    cuke(args, settings, opt, out, s) match {
         case 0 => 0
         case _ => sys.error("There were failed tests.")
       }
@@ -87,8 +91,9 @@ object CucumberPlugin extends Plugin with Integration {
     resolvers += "Templemore Repository" at "http://templemore.co.uk/repo",
     libraryDependencies += "templemore" %% "sbt-cucumber-integration" % projectVersion % "test",
 
-    cucumber <<= cucumberTask(false),
-    cucumberDryRun <<= cucumberTask(true),
+    cucumber <<= cucumberTask(false, false),
+    cucumberDryRun <<= cucumberTask(true, false),
+    cucumberRerun <<= cucumberTask(false, true),
     cucumberTestSettings <<= cucumberSettingsTask,
     cucumberOptions <<= cucumberOptionsTask,
     cucumberOutput <<= cucumberOutputTask,
