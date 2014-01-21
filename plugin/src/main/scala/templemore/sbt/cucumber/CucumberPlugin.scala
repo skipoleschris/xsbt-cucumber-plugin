@@ -34,11 +34,13 @@ object CucumberPlugin extends Plugin with Integration {
   val cucumberMonochrome = SettingKey[Boolean]("cucumber-monochrome")
 
   val cucumberPrettyReport = SettingKey[Boolean]("cucumber-pretty-report")
+  val cucumberRerunReport = SettingKey[Boolean]("cucumber-rerun-report")
   val cucumberHtmlReport = SettingKey[Boolean]("cucumber-html-report")
   val cucumberJunitReport = SettingKey[Boolean]("cucumber-junit-report")
   val cucumberJsonReport = SettingKey[Boolean]("cucumber-json-report")
 
   val cucumberPrettyReportFile = SettingKey[File]("cucumber-pretty-report-file")
+  val cucumberRerunReportFile = SettingKey[File]("cucumber-rerun-report-file")
   val cucumberHtmlReportDir = SettingKey[File]("cucumber-html-report-dir")
   val cucumberJsonReportFile = SettingKey[File]("cucumber-json-report-file")
   val cucumberJunitReportFile = SettingKey[File]("cucumber-junit-report-file")
@@ -56,9 +58,9 @@ object CucumberPlugin extends Plugin with Integration {
     val s = streams.value
 
     cuke(args, settings, if (dryRun) opt.asDryRun else opt, out, s) match {
-      case 0 => 0
-      case _ => sys.error("There were failed tests.")
-    }
+        case 0 => 0
+        case _ => sys.error("There were failed tests.")
+      }
   })
 
   protected def cucumberSettingsTask =
@@ -71,10 +73,10 @@ object CucumberPlugin extends Plugin with Integration {
      cucumberBefore, cucumberAfter, cucumberStrict, cucumberMonochrome) map ((fl, bp, o, bf, af, st, mo) => Options(fl, bp, o, bf, af, st, mo))
 
   protected def cucumberOutputTask =
-    (cucumberPrettyReport, cucumberHtmlReport, cucumberJunitReport, cucumberJsonReport,
-     cucumberPrettyReportFile, cucumberHtmlReportDir, cucumberJunitReportFile, cucumberJsonReportFile) map {
-      (pR, hR, juR, jsR, pRF, hRD, juRF, jsRF) => {
-        Output(pR, hR, juR, jsR, pRF, hRD, juRF, jsRF)
+    (cucumberPrettyReport, cucumberRerunReport, cucumberHtmlReport, cucumberJunitReport, cucumberJsonReport,
+     cucumberPrettyReportFile, cucumberRerunReportFile, cucumberHtmlReportDir, cucumberJunitReportFile, cucumberJsonReportFile) map {
+      (pR, rR, hR, juR, jsR, pRF, rRF, hRD, juRF, jsRF) => {
+        Output(pR, rR, hR, juR, jsR, pRF, rRF, hRD, juRF, jsRF)
       }
     }
 
@@ -105,11 +107,13 @@ object CucumberPlugin extends Plugin with Integration {
     cucumberMonochrome := false,
 
     cucumberPrettyReport := false,
+    cucumberRerunReport := false,
     cucumberHtmlReport := false,
     cucumberJunitReport := false,
     cucumberJsonReport := false,
 
     cucumberPrettyReportFile <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber.txt" },
+    cucumberRerunReportFile <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber.rerun.txt" },
     cucumberHtmlReportDir <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber-report" },
     cucumberJsonReportFile <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber.json" },
     cucumberJunitReportFile <<= (scalaVersion, target) { (sv, t) => t / "scala-%s".format(sv) / "cucumber.xml" },

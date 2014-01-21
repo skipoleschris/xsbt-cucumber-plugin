@@ -23,9 +23,16 @@ would run features tagged as @demo and not those tagged as @in-progress. Also:
 
     cucumber "User admin"
 
-would run features with a name matched to "User admin". Multiple arguments can be supplied and honour the following rules:
+would run features with a name matched to "User admin".
 
-* arguments starting with @ or ~ will be passed to cucumber using the --tags flag
+    cucumber features/some_feature.feature:7 features/another_feature.feature:49
+
+would run scenarios in the file features/some_feature.feature on line 7 and in features/another_feature.feature on line 49. Prepends features path automatically e.g. classpath:features/some_feature.feature:7.
+
+Multiple arguments can be supplied and honour the following rules:
+
+* arguments starting with "@" or "~" will be passed to cucumber using the --tags flag
+* arguments containing ":" will be appended to cucumbers arguments
 * arguments starting with anything else will be passed to cucumber using the --name flag
 
 **NEW** You can also run cucumber in the dry run mode to get information on which steps have been implemented without running those steps. There is a new task for this:
@@ -184,6 +191,7 @@ Note: The cucumberStepsBasePackage should be set in configurations to avoid scan
 
 ### Output Settings ###
 * cucumberPrettyReport - Outputs a pretty printed text file of the executed features instead of writing them to the console. The console display is default to just displaying progress dots. This solves the problem of interleaving of parallel test output when running in a multi-module project. Defaults to the Boolean value false
+* cucumberRerunReport - Outputs failed features with line numbers to a text file. Can be used later as "cucumber `cat target/scala-{scalaVersion}/cucumber.rerun.txt`". Defaults to the Boolean value false
 * cucumberHtmlReport - Outputs an html report of the executed features to a report directory. Defaults to the Boolean value false
 * cucumberJunitReport - Outputs a Junit format XML report file of the executed features. Defaults to the Boolean value false
 * cucumberJsonReport - Outputs a JSON format report file of the executed features. Defaults to the Boolean value false
@@ -191,6 +199,7 @@ Note: The cucumberStepsBasePackage should be set in configurations to avoid scan
 If none of the above are set to true then the default output is pretty printed features to the console. It is possible to support multiple outputs in a single run by setting more than one of the above settings to true. For multi-module projects it is recommended to set cucumberPrettyReport to true so that you don't end up with interleaved console output caused by cucumber being run concurrently for each project.
 
 * cucumberPrettyReportFile - The location of the pretty printed text report file. Defaults to a java.io.File of ./target/scala-{scalaVersion}/cucumber.txt
+* cucumberRerunReportFile - The location of the rerun file. Defaults to a java.io.File of ./target/scala-{scalaVersion}/cucumber.rerun.txt
 * cucumberHtmlReportDir - The directory for the html report. Defaults to a java.io.File of ./target/scala-{scalaVersion}/cucumber/
 * cucumberJunitReportFile - The location of the Junit XML report file. Defaults fo a java.io.File of ./target/scala-{scalaVersion}/cucumber.xml
 * cucumberJsonReportFile - The location of the JSON format report file. Defaults fo a java.io.File of ./target/scala-{scalaVersion}/cucumber.json
@@ -211,6 +220,11 @@ This plugin will continue to track releases of both SBT (0.10 and onwards) and C
 Requests for features can be posted to the issues list or emailed to the author.
 
 ## Release History ##
+
+### 0.8.1 ###
+
+Upgrade to cucumber-jvm version 1.1.5 for rerun report support.
+Rerun report support
 
 ### 0.8.0 ###
 

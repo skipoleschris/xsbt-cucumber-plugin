@@ -2,8 +2,10 @@
 target
 project/boot
 project/target
-.idea/workspace.xml
+.idea
+out
 .ensime_port
 xsbt-cucumber-plugin.sublime-workspace
 deploy-repo
+*~
 

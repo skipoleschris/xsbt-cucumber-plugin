@@ -38,23 +38,30 @@ trait Integration {
                           output: Output,
                           log: Logger) = {
     def tagsFromArgs = args.filter(isATag).toList
-    def namesFromArgs = args.filter(isNotATag).toList
+    def namesFromArgs = args.filter(isAName).toList
+    def featuresFromArgs = args.filter(isAFeature).toList.map(feature => options.featuresLocation + feature)
 
     def isATag(arg: String) = arg.startsWith("@") || arg.startsWith("~")
-    def isNotATag(arg: String) = !isATag(arg)
+    def isAFeature(arg: String) = arg.indexOf(":") != -1
+    def isAName(arg: String) = !isATag(arg) && !isAFeature(arg)
 
-    log.info("Running cucumber...")
+    var info = "Running cucumber"
+    if(!tagsFromArgs.isEmpty) info += " tags: " + tagsFromArgs.mkString(", ")
+    if(!featuresFromArgs.isEmpty) info += " features: " + featuresFromArgs.mkString(", ")
+    if(!namesFromArgs.isEmpty) info += " names: " + namesFromArgs.mkString(", ")
+    log.info(info)
     options.beforeFunc()
-    val result = launchCucumberInSeparateJvm(jvmSettings, options, output, tagsFromArgs, namesFromArgs)
+    val result = launchCucumberInSeparateJvm(log, jvmSettings, options, output, tagsFromArgs, namesFromArgs, featuresFromArgs)
     options.afterFunc()
     result
   }
 
-  private def launchCucumberInSeparateJvm(jvmSettings: JvmSettings, 
+  private def launchCucumberInSeparateJvm(log: Logger, jvmSettings: JvmSettings,
                                           options: Options,
                                           output: Output,
                                           tags: List[String], 
-                                          names: List[String]): Int = {
+                                          names: List[String],
+                                          features: List[String]): Int = {
     def makeOptionsList(options: List[String], flag: String) = options flatMap(List(flag, _))
     def prependOption(name: String)(on: Boolean, list: List[String]) = if (on) ("--%s".format(name) :: list) else list
 
@@ -66,9 +73,12 @@ trait Integration {
     val cucumberParams = ("--glue" :: options.basePackage :: Nil) ++
                          additionalOptions ++ 
                          output.options ++
-                         makeOptionsList(tags, "--tags") ++ 
+                         makeOptionsList(tags, "--tags") ++
                          makeOptionsList(names, "--name") ++
-                         (options.featuresLocation :: Nil)
+                         features ++
+                         (if (features.isEmpty) (options.featuresLocation :: Nil) else Nil)
+//    log.info(jvmSettings.toString())
+//    log.info(cucumberParams.toString())
     JvmLauncher(jvmSettings).launch(cucumberParams)
   }
 
