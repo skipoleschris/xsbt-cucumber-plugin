@@ -115,14 +115,12 @@ For example:
 ## Project Setup ##
 To install the cucumber plugin, add entries to the build plugins file (project/plugins/build.sbt) as follows:
 
-    resolvers += "Templemore Repository" at "https://raw.github.com/skipoleschris/xsbt-cucumber-plugin/mvn-repo/"
+    resolvers += "Templemore Repository" at "https://templemore.co.uk/repo/"
 
     addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.8.0")
 
 ### Basic Configuration ###
 To add the cucumber plugin settings to a basic project, just add the following to the build.sbt file:
-
-    resolvers += "Templemore Repository" at "https://raw.github.com/skipoleschris/xsbt-cucumber-plugin/mvn-repo"
 
     seq(cucumberSettings : _*)
 
