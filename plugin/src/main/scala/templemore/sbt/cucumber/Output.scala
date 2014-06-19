@@ -7,8 +7,8 @@ import java.io.File
  *
  * @author Chris Turner
  */
-case class Output(prettyReport: Boolean, htmlReport: Boolean, junitReport: Boolean, jsonReport: Boolean,
-                  prettyReportFile: File, htmlReportDir: File, junitReportFile: File, jsonReportFile: File) {
+case class Output(prettyReport: Boolean, rerunReport: Boolean, htmlReport: Boolean, junitReport: Boolean, jsonReport: Boolean,
+                  prettyReportFile: File, rerunReportFile: File, htmlReportDir: File, junitReportFile: File, jsonReportFile: File) {
 
   def options: List[String] = {
     (if (prettyReport) {
@@ -16,6 +16,10 @@ case class Output(prettyReport: Boolean, htmlReport: Boolean, junitReport: Boole
        "--format" :: "progress" :: "--format" :: "pretty:%s".format(prettyReportFile.getPath) :: Nil
      }
      else "--format" :: "pretty" :: Nil) ++
+    (if ( rerunReport) {
+        rerunReportFile.getParentFile.mkdirs()
+        "--format" :: "rerun:%s".format(rerunReportFile.getPath) :: Nil
+      } else Nil) ++
     (if ( htmlReport) {
        htmlReportDir.mkdirs()
        "--format" :: "html:%s".format(htmlReportDir.getPath) :: Nil

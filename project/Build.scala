@@ -5,7 +5,7 @@ object Settings {
   val buildOrganization = "templemore"
   val buildScalaVersion = "2.10.2"
   val crossBuildScalaVersions = Seq("2.9.3", "2.10.2")
-  val buildVersion      = "0.8.0"
+  val buildVersion      = "0.8.2"
 
   val buildSettings = Defaults.defaultSettings ++
                       Seq (organization  := buildOrganization,
@@ -13,11 +13,12 @@ object Settings {
                            version       := buildVersion,
                            scalacOptions ++= Seq("-deprecation", "-unchecked", "-encoding", "utf8"),
                            publishTo     := Some(Resolver.file("file",  new File("deploy-repo"))))
+//                           publishTo     := Some(Resolver.file("file",  new File(Path.userHome + "/.m2/repository"))))
 }
 
 object Dependencies {
 
-  private val CucumberVersion = "1.1.4"
+  private val CucumberVersion = "1.1.5"
 
   def cucumberJvm(scalaVersion: String) = 
     if ( scalaVersion.startsWith("2.9") ) "info.cukes" % "cucumber-scala_2.9" % CucumberVersion % "compile"
@@ -41,6 +42,6 @@ object Build extends Build {
     settings = buildSettings ++ 
                Seq(crossScalaVersions := crossBuildScalaVersions,
                libraryDependencies <+= scalaVersion { sv => cucumberJvm(sv) },
-               libraryDependencies += testInterface))
+                   libraryDependencies += testInterface))
 }
 
