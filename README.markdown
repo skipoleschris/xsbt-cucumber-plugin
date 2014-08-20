@@ -113,9 +113,9 @@ For example:
     }
 
 ## Project Setup ##
-To install the cucumber plugin, add entries to the build plugins file (project/plugins/build.sbt) as follows:
+To install the cucumber plugin, create the file `project/cucumber.sbt` and declare the plugin dependency:
 
-    resolvers += "Templemore Repository" at "https://templemore.co.uk/repo/"
+    resolvers += "Templemore Repository" at "http://templemore.co.uk/repo"
 
     addSbtPlugin("templemore" % "sbt-cucumber-plugin" % "0.8.0")
 
