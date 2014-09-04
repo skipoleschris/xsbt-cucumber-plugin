@@ -17,11 +17,10 @@ object Settings {
 
 object Dependencies {
 
-  private val CucumberVersion = "1.1.8"
+  private val CucumberVersion = "1.2.0-SNAPSHOT"
 
-  def cucumberJvm(scalaVersion: String) = 
-    if ( scalaVersion.startsWith("2.9") ) "info.cukes" % "cucumber-scala_2.9" % CucumberVersion % "compile"
-    else "info.cukes" %% "cucumber-scala" % CucumberVersion % "compile"
+  def cucumberJvm(scalaVersion: String) =
+    "info.cukes" %% "cucumber-scala" % CucumberVersion % "compile"
 
   val testInterface = "org.scala-tools.testing" % "test-interface" % "0.5" % "compile"
 }
@@ -38,8 +37,9 @@ object Build extends Build {
                Seq(crossScalaVersions := Seq.empty, sbtPlugin := true))
 
   lazy val integrationProject = Project ("sbt-cucumber-integration", file ("integration"),
-    settings = buildSettings ++ 
+    settings = buildSettings ++
                Seq(crossScalaVersions := crossBuildScalaVersions,
+               resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
                libraryDependencies <+= scalaVersion { sv => cucumberJvm(sv) },
                libraryDependencies += testInterface))
 }
