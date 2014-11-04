@@ -17,7 +17,7 @@ object Settings {
 
 object Dependencies {
 
-  private val CucumberVersion = "1.2.0-SNAPSHOT"
+  private val CucumberVersion = "1.2.0"
 
   def cucumberJvm(scalaVersion: String) =
     "info.cukes" %% "cucumber-scala" % CucumberVersion % "compile"
