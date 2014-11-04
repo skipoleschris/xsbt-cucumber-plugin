@@ -1,12 +1,13 @@
 package templemore.sbt.cucumber
 
-import scala.collection.JavaConverters._
+import cucumber.runtime.io.ResourceLoader
+import cucumber.runtime.scala.ScalaBackend
+
+import _root_.scala.collection.JavaConverters._
 import java.lang.reflect.InvocationTargetException
 import java.util.Properties
 
-import cucumber.runtime.Runtime
-import cucumber.runtime.RuntimeOptions
-import cucumber.runtime.snippets.SummaryPrinter
+import cucumber.runtime._
 import cucumber.runtime.model.CucumberFeature
 import gherkin.formatter.Formatter
 import gherkin.formatter.Reporter
@@ -21,7 +22,6 @@ class CucumberLauncher(debug: (String) => Unit, error: (String) => Unit) {
   }
 
   private def runCucumber(runtime: CucumberRuntime) = try { 
-    runtime.initialise
     runtime.run
     runtime.printSummary
     runtime.exitStatus
@@ -37,15 +37,14 @@ class CucumberLauncher(debug: (String) => Unit, error: (String) => Unit) {
                              formatter: Formatter, reporter: Reporter, summaryPrinter: SummaryPrinter) {
     private val loaderClass = loader.getClass.getInterfaces()(0)
 
-    def initialise = runtime.writeStepdefsJson()
-    def printSummary = summaryPrinter.print(runtime)
+    def printSummary() = runtime.printSummary()
     def exitStatus = runtime.exitStatus
 
     def run = {
-      val featureList = (classOf[RuntimeOptions].getMethod("cucumberFeatures", loaderClass)
+      val featureList = classOf[RuntimeOptions].getMethod("cucumberFeatures", loaderClass)
                                                 .invoke(options, loader)
                                                 .asInstanceOf[java.util.List[CucumberFeature]]
-                                                .asScala)
+                                                .asScala
       featureList foreach { feature => feature.run(formatter, reporter, runtime) }
     }
   }
@@ -58,11 +57,12 @@ class CucumberLauncher(debug: (String) => Unit, error: (String) => Unit) {
   
     val loaderClass = loadCucumberClasses(classLoader)
 
-    val options = new RuntimeOptions(properties, arguments :_*)
-    val loader = buildLoader(loaderClass)
+    val options = new RuntimeOptions(new Env(properties), arguments.toList.asJava)
+    val loader: ResourceLoader = buildLoader(loaderClass).asInstanceOf[ResourceLoader]
 
-    val runtimeConstructor = classOf[Runtime].getConstructor(loaderClass.getInterfaces()(0), classOf[ClassLoader], classOf[RuntimeOptions])
-    val runtime = runtimeConstructor.newInstance(loader, classLoader, options).asInstanceOf[Runtime]
+    val scalaBackend = new ScalaBackend(loader)
+    val runtimeConstructor = classOf[Runtime].getConstructor(loaderClass.getInterfaces()(0), classOf[ClassLoader], classOf[java.util.Collection[Backend]], classOf[RuntimeOptions])
+    val runtime = runtimeConstructor.newInstance(loader, classLoader, Seq(scalaBackend).asJava, options)
 
     CucumberRuntime(runtime, options, loader, 
                     options.formatter(classLoader), options.reporter(classLoader), new SummaryPrinter(System.out))
