@@ -50,7 +50,7 @@ object CucumberPlugin extends Plugin with Integration {
 
   protected def cucumberTask(dryRun: Boolean = false) = Def.inputTask({
     val args = Def.spaceDelimited("<args>").parsed
-    val settings = cucumberSettingsTask.value
+    val settings = cucumberTestSettings.value
     val opt = cucumberOptions.value
     val out = cucumberOutput.value
     val s = streams.value
